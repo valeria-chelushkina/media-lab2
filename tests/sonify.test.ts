@@ -80,18 +80,6 @@ describe('sonify', () => {
     expect(notes[2].timeBeats).toBe(8)
   })
 
-  it('maps columns to MIDI control changes', () => {
-    const config: SonificationConfig = {
-      ...defaultConfig,
-      controllers: [{ field: 'humidity', controller: 10, min: 0, max: 127 }]
-    }
-
-    const notes = sonify(rows, config)
-
-    expect(notes[0].controlChanges).toEqual([{ number: 10, value: 0 }])
-    expect(notes[2].controlChanges).toEqual([{ number: 10, value: 127 }])
-  })
-
   it('rejects rows with a missing indicator', () => {
     const brokenRows: NumericRow[] = [{ temperature: 10, humidity: 40 }]
 

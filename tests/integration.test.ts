@@ -23,8 +23,7 @@ const config: SonificationConfig = {
   velocity: { field: 'valence', min: 30, max: 120 },
   duration: { field: 'danceability', minBeats: 0.25, maxBeats: 0.9 },
   time: { mode: 'field', field: 'timestamp', minBeats: 0, maxBeats: 8 },
-  instrument: { mode: 'field', field: 'texture', programs: [0, 24] },
-  controllers: [{ field: 'valence', controller: 10, min: 0, max: 127 }]
+  instrument: { mode: 'field', field: 'texture', programs: [0, 24] }
 }
 
 describe('five-column sonification pipeline', () => {
@@ -33,11 +32,6 @@ describe('five-column sonification pipeline', () => {
 
     expect(notes.map((note) => note.timeBeats)).toEqual([0, 4, 8])
     expect(notes.map((note) => note.instrument)).toEqual([0, 24, 24])
-    expect(notes.map((note) => note.controlChanges)).toEqual([
-      [{ number: 10, value: 0 }],
-      [{ number: 10, value: 64 }],
-      [{ number: 10, value: 127 }]
-    ])
 
     const midi = buildMidi(notes, { tempo: 120, trackName: 'Five columns' })
     const parsed = new Midi(midi.toArray())
@@ -47,9 +41,5 @@ describe('five-column sonification pipeline', () => {
     expect(parsed.tracks[0].notes).toHaveLength(1)
     expect(parsed.tracks[1].notes).toHaveLength(2)
     expect(parsed.tracks[1].notes.map((note) => note.time)).toEqual([2, 4])
-
-    const pan = parsed.tracks[1].controlChanges[10]
-    expect(pan).toBeDefined()
-    expect(pan?.map((event) => Math.round(event.value * 127))).toEqual([64, 127])
   })
 })

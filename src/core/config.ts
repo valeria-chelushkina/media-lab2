@@ -51,17 +51,6 @@ const instrumentSchema = z.union([
   })
 ])
 
-const controllerSchema = z
-  .object({
-    field: z.string().min(1),
-    controller: z.number().int().min(0).max(127),
-    min: z.number().min(0).max(127),
-    max: z.number().min(0).max(127)
-  })
-  .refine((value) => value.min <= value.max, {
-    message: 'controller.min must be less than or equal to controller.max'
-  })
-
 export const sonificationConfigSchema = z.object({
   tempo: z.number().min(20).max(300),
   beatsPerRow: z.number().positive().max(16),
@@ -74,14 +63,12 @@ export const sonificationConfigSchema = z.object({
   velocity: velocitySchema,
   duration: durationSchema,
   time: timeSchema.optional(),
-  instrument: instrumentSchema.optional(),
-  controllers: z.array(controllerSchema).optional()
+  instrument: instrumentSchema.optional()
 })
 
 export type SonificationConfig = z.infer<typeof sonificationConfigSchema>
 export type TimeMapping = NonNullable<SonificationConfig['time']>
 export type InstrumentMapping = NonNullable<SonificationConfig['instrument']>
-export type ControllerMapping = NonNullable<SonificationConfig['controllers']>[number]
 
 /**
  * Default mapping for data/weather.csv.
@@ -107,8 +94,7 @@ export const defaultConfig: SonificationConfig = {
     maxBeats: 0.9
   },
   time: { mode: 'row' },
-  instrument: { mode: 'fixed', program: 0 },
-  controllers: []
+  instrument: { mode: 'fixed', program: 0 }
 }
 
 /**
@@ -134,8 +120,7 @@ export function createConfigForColumns(
     velocity: { ...base.velocity, field: names[1] },
     duration: { ...base.duration, field: names[2] ?? names[1] },
     time: { mode: 'row' },
-    instrument: { mode: 'fixed', program: 0 },
-    controllers: []
+    instrument: { mode: 'fixed', program: 0 }
   }
 }
 
@@ -145,7 +130,6 @@ export function mappedFields(config: SonificationConfig): string[] {
 
   if (config.time?.mode === 'field') fields.add(config.time.field)
   if (config.instrument?.mode === 'field') fields.add(config.instrument.field)
-  for (const controller of config.controllers ?? []) fields.add(controller.field)
 
   return Array.from(fields)
 }

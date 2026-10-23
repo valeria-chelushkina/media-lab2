@@ -10,7 +10,6 @@ function note(overrides: Partial<NoteEvent> = {}): NoteEvent {
     timeBeats: 0,
     durationBeats: 0.5,
     instrument: 0,
-    controlChanges: [],
     ...overrides
   }
 }
@@ -43,23 +42,6 @@ describe('buildMidi', () => {
     expect(first?.velocity).toBeCloseTo(64 / 127)
   })
 
-  it('writes control changes at the note onset', () => {
-    const midi = buildMidi(
-      [
-        note({
-          controlChanges: [{ number: 10, value: 64 }]
-        })
-      ],
-      { tempo: 100 }
-    )
-    const parsed = new Midi(midi.toArray())
-
-    const controller = parsed.tracks[0].controlChanges[10]?.[0]
-    expect(controller).toBeDefined()
-    expect(controller?.value).toBeCloseTo(64 / 127)
-    expect(controller?.time).toBeCloseTo(0)
-  })
-
   it('creates one track per instrument and assigns distinct channels', () => {
     const midi = buildMidi(
       [
@@ -85,8 +67,5 @@ describe('buildMidi', () => {
     expect(() => buildMidi([], { tempo: 100 })).toThrow(/without notes/)
     expect(() => buildMidi([note({ midi: 200 })], { tempo: 100 })).toThrow(/note number/)
     expect(() => buildMidi([note({ velocity: 0 })], { tempo: 100 })).toThrow(/velocity/)
-    expect(() =>
-      buildMidi([note({ controlChanges: [{ number: 200, value: 64 }] })], { tempo: 100 })
-    ).toThrow(/controller number/)
   })
 })

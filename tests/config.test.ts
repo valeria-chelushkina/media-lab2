@@ -10,7 +10,6 @@ describe('createConfigForColumns', () => {
     expect(config.duration.field).toBe('low')
     expect(config.instrument).toEqual({ mode: 'fixed', program: 0 })
     expect(config.time).toEqual({ mode: 'row' })
-    expect(config.controllers).toEqual([])
   })
 
   it('uses the second column for duration when only two columns exist', () => {

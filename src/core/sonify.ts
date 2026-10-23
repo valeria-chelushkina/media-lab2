@@ -28,11 +28,6 @@ export function sonify(rows: readonly NumericRow[], config: SonificationConfig):
   const instrumentNorm =
     instrument?.mode === 'field' ? makeNormalizer(series(rows, instrument.field)) : null
 
-  const controllers = (cfg.controllers ?? []).map((mapping) => ({
-    mapping,
-    normalize: makeNormalizer(series(rows, mapping.field))
-  }))
-
   return rows.map((row, index) => {
     const pitch = pitchNorm(row[cfg.pitch.field])
     const velocity = velocityNorm(row[cfg.velocity.field])
@@ -55,11 +50,7 @@ export function sonify(rows: readonly NumericRow[], config: SonificationConfig):
       velocity: Math.round(lerp(cfg.velocity.min, cfg.velocity.max, velocity)),
       timeBeats,
       durationBeats: lerp(cfg.duration.minBeats, cfg.duration.maxBeats, duration),
-      instrument: program,
-      controlChanges: controllers.map(({ mapping, normalize }) => ({
-        number: mapping.controller,
-        value: Math.round(lerp(mapping.min, mapping.max, normalize(row[mapping.field])))
-      }))
+      instrument: program
     }
   })
 }

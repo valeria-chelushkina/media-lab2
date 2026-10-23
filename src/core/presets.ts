@@ -47,8 +47,7 @@ function makeConfig(mapping: PresetMapping): SonificationConfig {
           field: mapping.instrument,
           programs: mapping.programs ?? [0, 24, 40, 48]
         }
-      : { mode: 'fixed', program: 0 },
-    controllers: []
+      : { mode: 'fixed', program: 0 }
   }
 }
 
