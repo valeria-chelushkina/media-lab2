@@ -1,7 +1,11 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { IPC, type MediaLabApi } from '../shared/ipc'
 
-const api = {}
+const api: MediaLabApi = {
+  openCsv: () => ipcRenderer.invoke(IPC.openCsv),
+  saveMidi: (bytes, defaultName) => ipcRenderer.invoke(IPC.saveMidi, bytes, defaultName)
+}
 
 if (process.contextIsolated) {
   try {

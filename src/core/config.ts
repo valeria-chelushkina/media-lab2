@@ -68,3 +68,29 @@ export const defaultConfig: SonificationConfig = {
     maxBeats: 0.9
   }
 }
+
+/**
+ * Builds a starting config for an arbitrary CSV. The first three numeric
+ * columns are assigned to pitch, velocity, and duration; with only two
+ * columns the second one drives both velocity and duration.
+ */
+export function createConfigForColumns(
+  columns: readonly string[],
+  base: SonificationConfig = defaultConfig
+): SonificationConfig {
+  const names = columns.map((column) => column.trim())
+  if (names.length < 2) {
+    throw new Error('At least two numeric columns are required')
+  }
+  if (names.some((name) => name.length === 0)) {
+    throw new Error('Column names must not be empty')
+  }
+
+  return {
+    ...base,
+    pitch: { ...base.pitch, field: names[0] },
+    velocity: { ...base.velocity, field: names[1] },
+    duration: { ...base.duration, field: names[2] ?? names[1] },
+    instrument: undefined
+  }
+}
