@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createConfigForColumns, defaultConfig } from '../src/core/config'
+import { createConfigForColumns, defaultConfig, unmappedFields } from '../src/core/config'
 
 describe('createConfigForColumns', () => {
   it('maps the first three columns to pitch, velocity and duration', () => {
@@ -33,6 +33,12 @@ describe('createConfigForColumns', () => {
     expect(config.tempo).toBe(defaultConfig.tempo)
     expect(config.pitch.scale).toEqual(defaultConfig.pitch.scale)
     expect(config.velocity.min).toBe(defaultConfig.velocity.min)
+  })
+
+  it('reports columns that are not used by any mapping', () => {
+    const config = createConfigForColumns(['a', 'b', 'c', 'd'])
+
+    expect(unmappedFields(['a', 'b', 'c', 'd'], config)).toEqual(['d'])
   })
 
   it('rejects fewer than two columns', () => {

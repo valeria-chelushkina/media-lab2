@@ -4,6 +4,7 @@ import { IPC, type MediaLabApi } from '../shared/ipc'
 
 const api: MediaLabApi = {
   openCsv: (hasHeader) => ipcRenderer.invoke(IPC.openCsv, hasHeader),
+  openSample: (presetId) => ipcRenderer.invoke(IPC.openSample, presetId),
   saveMidi: (bytes, defaultName) => ipcRenderer.invoke(IPC.saveMidi, bytes, defaultName),
   openMidi: (filePath) => ipcRenderer.invoke(IPC.openMidi, filePath)
 }

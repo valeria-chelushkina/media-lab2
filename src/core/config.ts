@@ -138,3 +138,20 @@ export function createConfigForColumns(
     controllers: []
   }
 }
+
+/** All dataset columns currently used by at least one mapping. */
+export function mappedFields(config: SonificationConfig): string[] {
+  const fields = new Set<string>([config.pitch.field, config.velocity.field, config.duration.field])
+
+  if (config.time?.mode === 'field') fields.add(config.time.field)
+  if (config.instrument?.mode === 'field') fields.add(config.instrument.field)
+  for (const controller of config.controllers ?? []) fields.add(controller.field)
+
+  return Array.from(fields)
+}
+
+/** Dataset columns that do not influence any MIDI parameter. */
+export function unmappedFields(columns: readonly string[], config: SonificationConfig): string[] {
+  const mapped = new Set(mappedFields(config))
+  return columns.filter((column) => !mapped.has(column))
+}

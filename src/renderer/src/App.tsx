@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { buildMidi } from '@core/buildMidi'
-import { createConfigForColumns, type SonificationConfig } from '@core/config'
+import { createConfigForColumns, unmappedFields, type SonificationConfig } from '@core/config'
+import { getSamplePreset, SAMPLE_PRESETS } from '@core/presets'
 import { sonify } from '@core/sonify'
 import type { Dataset, NoteEvent } from '@core/types'
 import { MappingEditor } from './components/MappingEditor'
@@ -59,6 +60,8 @@ function App(): React.JSX.Element {
       return { notes: [], error: toMessage(error), durationSeconds: 0 }
     }
   }, [dataset, config])
+
+  const unmapped = dataset && config ? unmappedFields(dataset.columns, config) : []
 
   useEffect(() => {
     return () => {
@@ -151,6 +154,41 @@ function App(): React.JSX.Element {
         message: result.warning
           ? `Loaded ${result.dataset.rows.length} rows. ${result.warning}`
           : `Loaded ${result.dataset.rows.length} rows and ${result.dataset.columns.length} columns.`
+      })
+    } catch (error) {
+      setStatus({ kind: 'error', message: toMessage(error) })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function handleLoadSample(presetId: string): Promise<void> {
+    const preset = getSamplePreset(presetId)
+    if (!preset || !window.api) return
+
+    stopPlayback()
+    setBusy(true)
+    setStatus({ kind: 'idle', message: `Loading ${preset.name}…` })
+
+    try {
+      const result = await window.api.openSample(presetId)
+
+      if (result.error || !result.dataset) {
+        setStatus({
+          kind: 'error',
+          message: result.error ?? 'The sample could not be loaded.'
+        })
+        return
+      }
+
+      setDataset(result.dataset)
+      setConfig(structuredClone(preset.config))
+      setSourceName(baseName(preset.file))
+      setHasHeader(preset.header)
+      setSavedPath(null)
+      setStatus({
+        kind: 'success',
+        message: `Loaded ${preset.name}: ${result.dataset.rows.length} rows, ${result.dataset.columns.length} columns.`
       })
     } catch (error) {
       setStatus({ kind: 'error', message: toMessage(error) })
@@ -271,6 +309,24 @@ function App(): React.JSX.Element {
             >
               Open CSV
             </button>
+            <select
+              className="sample-select"
+              value=""
+              onChange={(event) => {
+                const presetId = event.target.value
+                event.target.value = ''
+                if (presetId) void handleLoadSample(presetId)
+              }}
+              disabled={busy}
+              title="Load a bundled sample dataset and its suggested mapping"
+            >
+              <option value="">Load sample…</option>
+              {SAMPLE_PRESETS.map((preset) => (
+                <option key={preset.id} value={preset.id}>
+                  {preset.name}
+                </option>
+              ))}
+            </select>
             <button
               type="button"
               className="button"
@@ -379,6 +435,13 @@ function App(): React.JSX.Element {
                 config={config}
                 onChange={handleConfigChange}
               />
+
+              {unmapped.length > 0 ? (
+                <p className="mapping-warning">
+                  Unmapped indicators: {unmapped.join(', ')}. Every input column should affect at
+                  least one MIDI parameter.
+                </p>
+              ) : null}
             </section>
           </div>
         ) : (
@@ -390,10 +453,24 @@ function App(): React.JSX.Element {
               parameter.
             </p>
             <p className="empty-hint">
-              Try <code>data/weather.csv</code>, <code>data/climate.csv</code>,{' '}
-              <code>data/finance.csv</code>, or <code>data/seismic.csv</code>. If your file has no
-              header row, uncheck “First row is header” before opening it.
+              Pick a sample below, or open your own CSV. If your file has no header row, uncheck
+              “First row is header” first.
             </p>
+
+            <div className="sample-grid">
+              {SAMPLE_PRESETS.map((preset) => (
+                <button
+                  key={preset.id}
+                  type="button"
+                  className="sample-card"
+                  onClick={() => void handleLoadSample(preset.id)}
+                  disabled={busy}
+                >
+                  <strong>{preset.name}</strong>
+                  <span>{preset.description}</span>
+                </button>
+              ))}
+            </div>
           </section>
         )}
       </main>

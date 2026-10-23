@@ -5,6 +5,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { parseCsv } from '../core/loadCsv'
+import { getSamplePreset } from '../core/presets'
 import { IPC, type OpenCsvResult, type SaveMidiResult, type OpenMidiResult } from '../shared/ipc'
 
 let mainWindow: BrowserWindow | null = null
@@ -79,6 +80,26 @@ function registerIpcHandlers(): void {
     }
   })
 
+  ipcMain.removeHandler(IPC.openSample)
+  ipcMain.handle(IPC.openSample, async (_event, presetId: string): Promise<OpenCsvResult> => {
+    const preset = getSamplePreset(presetId)
+    if (!preset) {
+      return { canceled: false, error: 'Unknown sample preset.' }
+    }
+
+    try {
+      const filePath = sampleDataPath(preset.file)
+      const text = await readFile(filePath, 'utf8')
+      return {
+        canceled: false,
+        filePath,
+        dataset: parseCsv(text, { header: preset.header })
+      }
+    } catch (error) {
+      return { canceled: false, error: toMessage(error) }
+    }
+  })
+
   ipcMain.removeHandler(IPC.saveMidi)
   ipcMain.handle(
     IPC.saveMidi,
@@ -136,6 +157,11 @@ function registerIpcHandlers(): void {
       return { ok: false, error: toMessage(error) }
     }
   })
+}
+
+function sampleDataPath(file: string): string {
+  const root = app.isPackaged ? process.resourcesPath : app.getAppPath()
+  return join(root, 'data', file)
 }
 
 const NUMERIC_COLUMN = /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/

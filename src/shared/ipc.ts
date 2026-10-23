@@ -3,6 +3,7 @@ import type { Dataset } from '../core/types'
 /** Channel names shared by the main process, preload, and renderer. */
 export const IPC = {
   openCsv: 'csv:open',
+  openSample: 'sample:open',
   saveMidi: 'midi:save',
   openMidi: 'midi:open'
 } as const
@@ -28,6 +29,7 @@ export interface OpenMidiResult {
 
 export interface MediaLabApi {
   openCsv: (hasHeader?: boolean) => Promise<OpenCsvResult>
+  openSample: (presetId: string) => Promise<OpenCsvResult>
   saveMidi: (bytes: Uint8Array, defaultName?: string) => Promise<SaveMidiResult>
   openMidi: (filePath: string) => Promise<OpenMidiResult>
 }
