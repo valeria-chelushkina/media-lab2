@@ -2,22 +2,11 @@ import { parse } from 'csv-parse/sync'
 import type { Dataset, NumericRow } from './types'
 
 export interface CsvOptions {
-  /**
-   * Field delimiter. When omitted it is detected from the header line,
-   * which handles both comma CSV and semicolon CSV exported by Excel.
-   */
   delimiter?: string
-  /**
-   * Whether the first row contains column names. Defaults to true.
-   * When false, columns are named column1, column2, ... and every row is data.
-   */
   header?: boolean
 }
 
-/**
- * Parses a numeric CSV into a dataset. Every column must contain a finite
- * number; the first row is a header unless `header: false` is passed.
- */
+// parses a numeric CSV into a dataset
 export function parseCsv(text: string, options: CsvOptions = {}): Dataset {
   const cleaned = text.replace(/^\uFEFF/, '').trim()
   if (cleaned.length === 0) {

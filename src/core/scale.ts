@@ -1,6 +1,6 @@
 import { clamp01 } from './normalize'
 
-/** C major pentatonic: C, D, E, G, A. */
+// C major pentatonic: C, D, E, G, A
 export const MAJOR_PENTATONIC: readonly number[] = [0, 2, 4, 7, 9]
 
 export interface ScalePreset {
@@ -8,7 +8,7 @@ export interface ScalePreset {
   degrees: readonly number[]
 }
 
-/** Scale presets available in the mapping editor. */
+// scale presets available in the mapping editor
 export const SCALE_PRESETS: readonly ScalePreset[] = [
   { name: 'Major pentatonic', degrees: MAJOR_PENTATONIC },
   { name: 'Minor pentatonic', degrees: [0, 3, 5, 7, 10] },

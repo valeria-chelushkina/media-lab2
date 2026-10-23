@@ -3,7 +3,6 @@ export interface InstrumentPreset {
   name: string
 }
 
-/** A small curated General MIDI palette used by the UI. */
 export const INSTRUMENT_PRESETS: readonly InstrumentPreset[] = [
   { program: 0, name: 'Piano' },
   { program: 24, name: 'Guitar' },

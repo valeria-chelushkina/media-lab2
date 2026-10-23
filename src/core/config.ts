@@ -70,10 +70,7 @@ export type SonificationConfig = z.infer<typeof sonificationConfigSchema>
 export type TimeMapping = NonNullable<SonificationConfig['time']>
 export type InstrumentMapping = NonNullable<SonificationConfig['instrument']>
 
-/**
- * Default mapping for data/weather.csv.
- * temperature -> pitch, humidity -> velocity, pressure -> duration.
- */
+// Default mapping for data/weather.csv.
 export const defaultConfig: SonificationConfig = {
   tempo: 100,
   beatsPerRow: 1,
@@ -124,7 +121,7 @@ export function createConfigForColumns(
   }
 }
 
-/** All dataset columns currently used by at least one mapping. */
+// all dataset columns currently used by at least one mapping
 export function mappedFields(config: SonificationConfig): string[] {
   const fields = new Set<string>([config.pitch.field, config.velocity.field, config.duration.field])
 
@@ -134,7 +131,7 @@ export function mappedFields(config: SonificationConfig): string[] {
   return Array.from(fields)
 }
 
-/** Dataset columns that do not influence any MIDI parameter. */
+// dataset columns that do not influence any MIDI parameter
 export function unmappedFields(columns: readonly string[], config: SonificationConfig): string[] {
   const mapped = new Set(mappedFields(config))
   return columns.filter((column) => !mapped.has(column))
