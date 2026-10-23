@@ -3,13 +3,7 @@ import { lerp, makeNormalizer } from './normalize'
 import { toMidiNote } from './scale'
 import type { NoteEvent, NumericRow } from './types'
 
-/**
- * Converts numeric rows into note events.
- *
- * Each configured field is normalized independently with min-max, then mapped
- * to its MIDI parameter. The function is pure and deterministic: the same rows
- * and config always produce the same notes.
- */
+// Converts numeric rows into note events.
 export function sonify(rows: readonly NumericRow[], config: SonificationConfig): NoteEvent[] {
   const cfg = sonificationConfigSchema.parse(config)
 
