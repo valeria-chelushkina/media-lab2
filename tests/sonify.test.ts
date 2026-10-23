@@ -51,6 +51,7 @@ describe('sonify', () => {
     const config: SonificationConfig = {
       ...defaultConfig,
       instrument: {
+        mode: 'field',
         field: 'humidity',
         programs: [0, 24]
       }
@@ -60,6 +61,35 @@ describe('sonify', () => {
 
     expect(notes[0].instrument).toBe(0)
     expect(notes[2].instrument).toBe(24)
+  })
+
+  it('maps a time column to note onsets', () => {
+    const config: SonificationConfig = {
+      ...defaultConfig,
+      time: {
+        mode: 'field',
+        field: 'pressure',
+        minBeats: 0,
+        maxBeats: 8
+      }
+    }
+
+    const notes = sonify(rows, config)
+
+    expect(notes[0].timeBeats).toBe(0)
+    expect(notes[2].timeBeats).toBe(8)
+  })
+
+  it('maps columns to MIDI control changes', () => {
+    const config: SonificationConfig = {
+      ...defaultConfig,
+      controllers: [{ field: 'humidity', controller: 10, min: 0, max: 127 }]
+    }
+
+    const notes = sonify(rows, config)
+
+    expect(notes[0].controlChanges).toEqual([{ number: 10, value: 0 }])
+    expect(notes[2].controlChanges).toEqual([{ number: 10, value: 127 }])
   })
 
   it('rejects rows with a missing indicator', () => {

@@ -25,6 +25,13 @@ describe('parseCsv', () => {
     expect(dataset.rows[0]).toEqual({ temperature: 12.5, humidity: 65 })
   })
 
+  it('trims spaces around header names', () => {
+    const dataset = parseCsv('temperature, humidity\n12.5, 65\n')
+
+    expect(dataset.columns).toEqual(['temperature', 'humidity'])
+    expect(dataset.rows[0]).toEqual({ temperature: 12.5, humidity: 65 })
+  })
+
   it('rejects a non-numeric cell', () => {
     expect(() => parseCsv('temperature,humidity\n12.5,cold\n')).toThrow(/not a finite number/)
   })

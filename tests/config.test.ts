@@ -8,7 +8,9 @@ describe('createConfigForColumns', () => {
     expect(config.pitch.field).toBe('open')
     expect(config.velocity.field).toBe('high')
     expect(config.duration.field).toBe('low')
-    expect(config.instrument).toBeUndefined()
+    expect(config.instrument).toEqual({ mode: 'fixed', program: 0 })
+    expect(config.time).toEqual({ mode: 'row' })
+    expect(config.controllers).toEqual([])
   })
 
   it('uses the second column for duration when only two columns exist', () => {

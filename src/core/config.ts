@@ -23,6 +23,45 @@ const durationSchema = z
     message: 'duration.minBeats must be less than or equal to duration.maxBeats'
   })
 
+const timeSchema = z.union([
+  z.object({
+    mode: z.literal('row')
+  }),
+  z
+    .object({
+      mode: z.literal('field'),
+      field: z.string().min(1),
+      minBeats: z.number().min(0),
+      maxBeats: z.number().positive()
+    })
+    .refine((value) => value.minBeats <= value.maxBeats, {
+      message: 'time.minBeats must be less than or equal to time.maxBeats'
+    })
+])
+
+const instrumentSchema = z.union([
+  z.object({
+    mode: z.literal('fixed'),
+    program: z.number().int().min(0).max(127)
+  }),
+  z.object({
+    mode: z.literal('field'),
+    field: z.string().min(1),
+    programs: z.array(z.number().int().min(0).max(127)).min(1)
+  })
+])
+
+const controllerSchema = z
+  .object({
+    field: z.string().min(1),
+    controller: z.number().int().min(0).max(127),
+    min: z.number().min(0).max(127),
+    max: z.number().min(0).max(127)
+  })
+  .refine((value) => value.min <= value.max, {
+    message: 'controller.min must be less than or equal to controller.max'
+  })
+
 export const sonificationConfigSchema = z.object({
   tempo: z.number().min(20).max(300),
   beatsPerRow: z.number().positive().max(16),
@@ -34,15 +73,15 @@ export const sonificationConfigSchema = z.object({
   }),
   velocity: velocitySchema,
   duration: durationSchema,
-  instrument: z
-    .object({
-      field: z.string().min(1),
-      programs: z.array(z.number().int().min(0).max(127)).min(1)
-    })
-    .optional()
+  time: timeSchema.optional(),
+  instrument: instrumentSchema.optional(),
+  controllers: z.array(controllerSchema).optional()
 })
 
 export type SonificationConfig = z.infer<typeof sonificationConfigSchema>
+export type TimeMapping = NonNullable<SonificationConfig['time']>
+export type InstrumentMapping = NonNullable<SonificationConfig['instrument']>
+export type ControllerMapping = NonNullable<SonificationConfig['controllers']>[number]
 
 /**
  * Default mapping for data/weather.csv.
@@ -66,7 +105,10 @@ export const defaultConfig: SonificationConfig = {
     field: 'pressure',
     minBeats: 0.25,
     maxBeats: 0.9
-  }
+  },
+  time: { mode: 'row' },
+  instrument: { mode: 'fixed', program: 0 },
+  controllers: []
 }
 
 /**
@@ -91,6 +133,8 @@ export function createConfigForColumns(
     pitch: { ...base.pitch, field: names[0] },
     velocity: { ...base.velocity, field: names[1] },
     duration: { ...base.duration, field: names[2] ?? names[1] },
-    instrument: undefined
+    time: { mode: 'row' },
+    instrument: { mode: 'fixed', program: 0 },
+    controllers: []
   }
 }

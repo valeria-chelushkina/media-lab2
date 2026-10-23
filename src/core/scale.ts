@@ -3,6 +3,23 @@ import { clamp01 } from './normalize'
 /** C major pentatonic: C, D, E, G, A. */
 export const MAJOR_PENTATONIC: readonly number[] = [0, 2, 4, 7, 9]
 
+export interface ScalePreset {
+  name: string
+  degrees: readonly number[]
+}
+
+/** Scale presets available in the mapping editor. */
+export const SCALE_PRESETS: readonly ScalePreset[] = [
+  { name: 'Major pentatonic', degrees: MAJOR_PENTATONIC },
+  { name: 'Minor pentatonic', degrees: [0, 3, 5, 7, 10] },
+  { name: 'Major', degrees: [0, 2, 4, 5, 7, 9, 11] },
+  { name: 'Natural minor', degrees: [0, 2, 3, 5, 7, 8, 10] },
+  {
+    name: 'Chromatic',
+    degrees: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+  }
+]
+
 /**
  * Maps a normalized value in [0, 1] to a MIDI note inside a scale.
  *

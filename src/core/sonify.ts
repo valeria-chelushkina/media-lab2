@@ -20,23 +20,46 @@ export function sonify(rows: readonly NumericRow[], config: SonificationConfig):
   const pitchNorm = makeNormalizer(series(rows, cfg.pitch.field))
   const velocityNorm = makeNormalizer(series(rows, cfg.velocity.field))
   const durationNorm = makeNormalizer(series(rows, cfg.duration.field))
+
+  const time = cfg.time ?? { mode: 'row' as const }
+  const timeNorm = time.mode === 'field' ? makeNormalizer(series(rows, time.field)) : null
+
   const instrument = cfg.instrument
-  const instrumentNorm = instrument ? makeNormalizer(series(rows, instrument.field)) : null
+  const instrumentNorm =
+    instrument?.mode === 'field' ? makeNormalizer(series(rows, instrument.field)) : null
+
+  const controllers = (cfg.controllers ?? []).map((mapping) => ({
+    mapping,
+    normalize: makeNormalizer(series(rows, mapping.field))
+  }))
 
   return rows.map((row, index) => {
     const pitch = pitchNorm(row[cfg.pitch.field])
     const velocity = velocityNorm(row[cfg.velocity.field])
     const duration = durationNorm(row[cfg.duration.field])
 
+    const timeBeats =
+      time.mode === 'field' && timeNorm
+        ? lerp(time.minBeats, time.maxBeats, timeNorm(row[time.field]))
+        : index * cfg.beatsPerRow
+
+    const program =
+      instrument?.mode === 'fixed'
+        ? instrument.program
+        : instrument && instrumentNorm
+          ? pickProgram(instrument.programs, row[instrument.field], instrumentNorm)
+          : 0
+
     return {
       midi: toMidiNote(pitch, cfg.pitch.rootNote, cfg.pitch.octaves, cfg.pitch.scale),
       velocity: Math.round(lerp(cfg.velocity.min, cfg.velocity.max, velocity)),
-      timeBeats: index * cfg.beatsPerRow,
+      timeBeats,
       durationBeats: lerp(cfg.duration.minBeats, cfg.duration.maxBeats, duration),
-      instrument:
-        instrument && instrumentNorm
-          ? pickProgram(instrument.programs, row[instrument.field], instrumentNorm)
-          : 0
+      instrument: program,
+      controlChanges: controllers.map(({ mapping, normalize }) => ({
+        number: mapping.controller,
+        value: Math.round(lerp(mapping.min, mapping.max, normalize(row[mapping.field])))
+      }))
     }
   })
 }

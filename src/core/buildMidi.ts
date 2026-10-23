@@ -46,9 +46,19 @@ export function buildMidi(notes: readonly NoteEvent[], options: MidiBuildOptions
     track.name = groups.size > 1 ? `${baseName} · ${track.instrument.name}` : baseName
 
     for (const note of group) {
+      const noteTime = note.timeBeats * secondsPerBeat
+
+      for (const controlChange of note.controlChanges) {
+        track.addCC({
+          number: controlChange.number,
+          value: controlChange.value / 127,
+          time: noteTime
+        })
+      }
+
       track.addNote({
         midi: note.midi,
-        time: note.timeBeats * secondsPerBeat,
+        time: noteTime,
         duration: note.durationBeats * secondsPerBeat,
         velocity: note.velocity / 127
       })
@@ -78,5 +88,21 @@ function validateNote(note: NoteEvent): void {
   }
   if (!Number.isInteger(note.instrument) || note.instrument < 0 || note.instrument > 127) {
     throw new Error(`Invalid MIDI program: ${note.instrument}`)
+  }
+  for (const controlChange of note.controlChanges) {
+    if (
+      !Number.isInteger(controlChange.number) ||
+      controlChange.number < 0 ||
+      controlChange.number > 127
+    ) {
+      throw new Error(`Invalid controller number: ${controlChange.number}`)
+    }
+    if (
+      !Number.isFinite(controlChange.value) ||
+      controlChange.value < 0 ||
+      controlChange.value > 127
+    ) {
+      throw new Error(`Invalid controller value: ${controlChange.value}`)
+    }
   }
 }

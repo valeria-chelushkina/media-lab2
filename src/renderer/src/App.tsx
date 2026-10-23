@@ -3,6 +3,7 @@ import { buildMidi } from '@core/buildMidi'
 import { createConfigForColumns, type SonificationConfig } from '@core/config'
 import { sonify } from '@core/sonify'
 import type { Dataset } from '@core/types'
+import { MappingEditor } from './components/MappingEditor'
 
 type StatusKind = 'idle' | 'success' | 'error'
 
@@ -15,8 +16,6 @@ const INITIAL_STATUS: Status = {
   kind: 'idle',
   message: 'Open a CSV file with at least two numeric columns to begin.'
 }
-
-const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
 function App(): React.JSX.Element {
   const [dataset, setDataset] = useState<Dataset | null>(null)
@@ -102,6 +101,12 @@ function App(): React.JSX.Element {
     }
   }
 
+  function handleReset(): void {
+    if (!dataset) return
+    setConfig(createConfigForColumns(dataset.columns))
+    setStatus({ kind: 'idle', message: 'Mapping reset to defaults.' })
+  }
+
   return (
     <div className="app">
       <header className="app-header">
@@ -178,37 +183,19 @@ function App(): React.JSX.Element {
               ) : null}
             </section>
 
-            <section className="panel">
+            <section className="panel mapping-panel">
               <div className="panel-heading">
                 <h2>Mapping</h2>
-                <span>auto-selected</span>
+                <button type="button" className="text-button" onClick={handleReset}>
+                  Reset
+                </button>
               </div>
 
-              <div className="mapping-list">
-                <MappingRow
-                  label="Pitch"
-                  field={config.pitch.field}
-                  detail={`root ${midiName(config.pitch.rootNote)} · ${config.pitch.octaves} octave${
-                    config.pitch.octaves === 1 ? '' : 's'
-                  } · ${config.pitch.scale.length} degrees/octave`}
-                />
-                <MappingRow
-                  label="Velocity"
-                  field={config.velocity.field}
-                  detail={`${config.velocity.min}–${config.velocity.max}`}
-                />
-                <MappingRow
-                  label="Duration"
-                  field={config.duration.field}
-                  detail={`${config.duration.minBeats}–${config.duration.maxBeats} beat`}
-                />
-                <MappingRow label="Instrument" field="fixed" detail="program 0 · piano" />
-              </div>
-
-              <div className="mapping-footer">
-                <span>Tempo</span>
-                <strong>{config.tempo} BPM</strong>
-              </div>
+              <MappingEditor
+                columns={dataset.columns}
+                config={config}
+                onChange={(next) => setConfig(next)}
+              />
             </section>
           </div>
         ) : (
@@ -216,7 +203,8 @@ function App(): React.JSX.Element {
             <h2>No dataset loaded</h2>
             <p>
               Open a CSV where every column is numeric. The first three columns are mapped to pitch,
-              velocity, and duration using the project defaults.
+              velocity, and duration by default — then you can remap any column to any MIDI
+              parameter.
             </p>
             <p className="empty-hint">
               Try <code>data/weather.csv</code>.
@@ -225,31 +213,9 @@ function App(): React.JSX.Element {
         )}
       </main>
 
-      <footer className="app-footer">v0.1.0 · local desktop app · MIDI output</footer>
+      <footer className="app-footer">v0.2.0 · local desktop app · MIDI output</footer>
     </div>
   )
-}
-
-interface MappingRowProps {
-  label: string
-  field: string
-  detail: string
-}
-
-function MappingRow({ label, field, detail }: MappingRowProps): React.JSX.Element {
-  return (
-    <div className="mapping-row">
-      <span className="mapping-label">{label}</span>
-      <code className="mapping-field">{field}</code>
-      <span className="mapping-detail">{detail}</span>
-    </div>
-  )
-}
-
-function midiName(note: number): string {
-  const name = NOTE_NAMES[((note % 12) + 12) % 12]
-  const octave = Math.floor(note / 12) - 1
-  return `${name}${octave}`
 }
 
 function formatNumber(value: number | undefined): string {

@@ -21,6 +21,16 @@ export interface NoteEvent {
   durationBeats: number
   /** General MIDI program number, 0-127. */
   instrument: number
+  /** Controller events applied at the note's start time. */
+  controlChanges: ControlChangeValue[]
+}
+
+/** A MIDI continuous-controller value, 0-127. */
+export interface ControlChangeValue {
+  /** Controller number, 0-127. */
+  number: number
+  /** Controller value, 0-127. */
+  value: number
 }
 
 export interface MidiBuildOptions {

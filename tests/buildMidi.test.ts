@@ -3,9 +3,21 @@ import { describe, expect, it } from 'vitest'
 import { buildMidi, midiToBytes } from '../src/core/buildMidi'
 import type { NoteEvent } from '../src/core/types'
 
+function note(overrides: Partial<NoteEvent> = {}): NoteEvent {
+  return {
+    midi: 60,
+    velocity: 64,
+    timeBeats: 0,
+    durationBeats: 0.5,
+    instrument: 0,
+    controlChanges: [],
+    ...overrides
+  }
+}
+
 const notes: NoteEvent[] = [
-  { midi: 60, velocity: 64, timeBeats: 0, durationBeats: 0.5, instrument: 0 },
-  { midi: 64, velocity: 100, timeBeats: 1, durationBeats: 0.5, instrument: 0 }
+  note({ midi: 60, velocity: 64 }),
+  note({ midi: 64, velocity: 100, timeBeats: 1 })
 ]
 
 describe('buildMidi', () => {
@@ -24,18 +36,35 @@ describe('buildMidi', () => {
     expect(parsed.tracks[0].name).toBe('Test')
     expect(parsed.tracks[0].notes).toHaveLength(2)
 
-    const first = parsed.tracks[0].notes.find((note) => note.midi === 60)
+    const first = parsed.tracks[0].notes.find((entry) => entry.midi === 60)
     expect(first).toBeDefined()
     expect(first?.time).toBeCloseTo(0)
     expect(first?.duration).toBeCloseTo(0.25)
     expect(first?.velocity).toBeCloseTo(64 / 127)
   })
 
+  it('writes control changes at the note onset', () => {
+    const midi = buildMidi(
+      [
+        note({
+          controlChanges: [{ number: 10, value: 64 }]
+        })
+      ],
+      { tempo: 100 }
+    )
+    const parsed = new Midi(midi.toArray())
+
+    const controller = parsed.tracks[0].controlChanges[10]?.[0]
+    expect(controller).toBeDefined()
+    expect(controller?.value).toBeCloseTo(64 / 127)
+    expect(controller?.time).toBeCloseTo(0)
+  })
+
   it('creates one track per instrument and assigns distinct channels', () => {
     const midi = buildMidi(
       [
-        { midi: 60, velocity: 80, timeBeats: 0, durationBeats: 1, instrument: 0 },
-        { midi: 67, velocity: 90, timeBeats: 1, durationBeats: 1, instrument: 24 }
+        note({ midi: 60, velocity: 80, durationBeats: 1, instrument: 0 }),
+        note({ midi: 67, velocity: 90, timeBeats: 1, durationBeats: 1, instrument: 24 })
       ],
       { tempo: 100, trackName: 'Instruments' }
     )
@@ -54,15 +83,10 @@ describe('buildMidi', () => {
 
   it('rejects empty input and invalid notes', () => {
     expect(() => buildMidi([], { tempo: 100 })).toThrow(/without notes/)
+    expect(() => buildMidi([note({ midi: 200 })], { tempo: 100 })).toThrow(/note number/)
+    expect(() => buildMidi([note({ velocity: 0 })], { tempo: 100 })).toThrow(/velocity/)
     expect(() =>
-      buildMidi([{ midi: 200, velocity: 64, timeBeats: 0, durationBeats: 1, instrument: 0 }], {
-        tempo: 100
-      })
-    ).toThrow(/note number/)
-    expect(() =>
-      buildMidi([{ midi: 60, velocity: 0, timeBeats: 0, durationBeats: 1, instrument: 0 }], {
-        tempo: 100
-      })
-    ).toThrow(/velocity/)
+      buildMidi([note({ controlChanges: [{ number: 200, value: 64 }] })], { tempo: 100 })
+    ).toThrow(/controller number/)
   })
 })
