@@ -6,14 +6,14 @@ import { midiName } from '../lib/midi'
 const HEIGHT = 240
 const PADDING = { left: 42, right: 14, top: 12, bottom: 24 }
 const COLORS = [
-  '#7c9cff',
-  '#7dd3a8',
-  '#f6c177',
-  '#c792ea',
-  '#ff8f8f',
-  '#6fd3e8',
-  '#d4a5ff',
-  '#9ee6a8'
+  '#a96b7e',
+  '#62886f',
+  '#a8824f',
+  '#806f9e',
+  '#a86a6a',
+  '#5b8794',
+  '#96709f',
+  '#6b8f70'
 ]
 
 interface PianoRollProps {
@@ -64,7 +64,7 @@ export function PianoRoll({ notes, progress }: PianoRollProps): React.JSX.Elemen
           width={geometry.plotWidth}
           height={geometry.plotHeight}
           rx={6}
-          fill="rgba(255, 255, 255, 0.015)"
+          fill="rgba(253, 252, 252, 0.8)"
         />
 
         {geometry.beatLines.map((line) => (
@@ -74,10 +74,10 @@ export function PianoRoll({ notes, progress }: PianoRollProps): React.JSX.Elemen
               x2={line.x}
               y1={PADDING.top}
               y2={PADDING.top + geometry.plotHeight}
-              stroke="rgba(255, 255, 255, 0.06)"
+              stroke="rgba(60, 55, 55, 0.08)"
             />
             {line.label !== null ? (
-              <text x={line.x} y={HEIGHT - 7} fill="#9aa0b4" fontSize={9} textAnchor="middle">
+              <text x={line.x} y={HEIGHT - 7} fill="#746b6d" fontSize={9} textAnchor="middle">
                 {line.label}
               </text>
             ) : null}
@@ -91,9 +91,9 @@ export function PianoRoll({ notes, progress }: PianoRollProps): React.JSX.Elemen
               x2={PADDING.left + geometry.plotWidth}
               y1={line.y}
               y2={line.y}
-              stroke="rgba(255, 255, 255, 0.1)"
+              stroke="rgba(60, 55, 55, 0.14)"
             />
-            <text x={PADDING.left - 7} y={line.y + 3} fill="#9aa0b4" fontSize={9} textAnchor="end">
+            <text x={PADDING.left - 7} y={line.y + 3} fill="#746b6d" fontSize={9} textAnchor="end">
               {line.label}
             </text>
           </g>
@@ -120,7 +120,7 @@ export function PianoRoll({ notes, progress }: PianoRollProps): React.JSX.Elemen
             x2={playheadX}
             y1={PADDING.top}
             y2={PADDING.top + geometry.plotHeight}
-            stroke="#ffb86b"
+            stroke="#96596d"
             strokeWidth={2}
           />
         ) : null}
@@ -226,7 +226,7 @@ function buildGeometry(notes: readonly NoteEvent[], width: number): Geometry {
       width: noteWidth,
       height: Math.max(3, rowHeight * 0.76),
       color: colorByProgram.get(note.instrument) ?? COLORS[0],
-      opacity: 0.45 + 0.55 * (note.velocity / 127),
+      opacity: 0.72 + 0.28 * (note.velocity / 127),
       label: `${midiName(note.midi)} · velocity ${note.velocity} · ${note.durationBeats.toFixed(2)} beats`
     }
   })

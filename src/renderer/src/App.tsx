@@ -279,12 +279,8 @@ function App(): React.JSX.Element {
           <span className="brand-mark" aria-hidden="true">
             ♪
           </span>
-          <div>
-            <h1>Data Sonifier</h1>
-            <p>Media Lab 2 · numeric data → MIDI</p>
-          </div>
+          <h1>Data Sonifier</h1>
         </div>
-        <span className="stack-badge">Electron · React · TypeScript</span>
       </header>
 
       <main className="workspace">
@@ -388,7 +384,7 @@ function App(): React.JSX.Element {
 
         {dataset && config ? (
           <div className="content-grid">
-            <section className="panel">
+            <section className="panel dataset-panel">
               <div className="panel-heading">
                 <h2>Dataset</h2>
                 <span>
@@ -398,6 +394,11 @@ function App(): React.JSX.Element {
 
               <div className="table-wrap">
                 <table className="data-table">
+                  <colgroup>
+                    {dataset.columns.map((column) => (
+                      <col key={column} style={{ width: `${100 / dataset.columns.length}%` }} />
+                    ))}
+                  </colgroup>
                   <thead>
                     <tr>
                       {dataset.columns.map((column) => (
@@ -474,8 +475,6 @@ function App(): React.JSX.Element {
           </section>
         )}
       </main>
-
-      <footer className="app-footer">v0.4.0 · local desktop app · MIDI output</footer>
     </div>
   )
 }
