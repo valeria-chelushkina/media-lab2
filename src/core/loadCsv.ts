@@ -7,12 +7,16 @@ export interface CsvOptions {
    * which handles both comma CSV and semicolon CSV exported by Excel.
    */
   delimiter?: string
+  /**
+   * Whether the first row contains column names. Defaults to true.
+   * When false, columns are named column1, column2, ... and every row is data.
+   */
+  header?: boolean
 }
 
 /**
- * Parses a numeric CSV into a dataset. The first row must contain unique
- * column names; every subsequent row must contain a finite number in every
- * column.
+ * Parses a numeric CSV into a dataset. Every column must contain a finite
+ * number; the first row is a header unless `header: false` is passed.
  */
 export function parseCsv(text: string, options: CsvOptions = {}): Dataset {
   const cleaned = text.replace(/^\uFEFF/, '').trim()
@@ -21,46 +25,82 @@ export function parseCsv(text: string, options: CsvOptions = {}): Dataset {
   }
 
   const delimiter = options.delimiter ?? detectDelimiter(cleaned)
+  const hasHeader = options.header ?? true
 
-  let records: Record<string, string>[]
+  let records: string[][]
   try {
     records = parse(cleaned, {
-      columns: true,
+      columns: false,
       skip_empty_lines: true,
       trim: true,
       delimiter,
       relax_column_count: false
-    }) as Record<string, string>[]
+    }) as string[][]
   } catch (error) {
     throw new Error(`Invalid CSV: ${(error as Error).message}`, { cause: error })
   }
 
   if (records.length === 0) {
-    throw new Error('CSV must contain a header and at least one data row')
+    throw new Error('CSV must contain at least one row')
   }
 
-  const columns = Object.keys(records[0])
-  if (columns.length < 2) {
+  const width = records[0].length
+  if (width < 2) {
     throw new Error('CSV must contain at least two numeric columns for sonification')
   }
 
-  const rows = records.map((record, rowIndex) => {
+  let columns: string[]
+  let dataRecords: string[][]
+
+  if (hasHeader) {
+    columns = records[0].map((name) => name.trim())
+    validateHeader(columns)
+    dataRecords = records.slice(1)
+
+    if (dataRecords.length === 0) {
+      throw new Error('CSV must contain a header and at least one data row')
+    }
+  } else {
+    columns = Array.from({ length: width }, (_, index) => `column${index + 1}`)
+    dataRecords = records
+  }
+
+  const rows = dataRecords.map((record, rowIndex) => {
+    if (record.length !== columns.length) {
+      throw new Error(
+        `Row ${rowIndex + (hasHeader ? 2 : 1)}: expected ${columns.length} columns, got ${record.length}`
+      )
+    }
+
     const row: NumericRow = {}
-    for (const column of columns) {
-      const raw = record[column]
-      if (raw === undefined) {
-        throw new Error(`Row ${rowIndex + 2}: missing column "${column}"`)
-      }
+    for (let index = 0; index < columns.length; index += 1) {
+      const raw = record[index]
       const value = toNumber(raw)
       if (value === null) {
-        throw new Error(`Row ${rowIndex + 2}, column "${column}": "${raw}" is not a finite number`)
+        throw new Error(
+          `Row ${rowIndex + (hasHeader ? 2 : 1)}, column "${columns[index]}": "${raw}" is not a finite number`
+        )
       }
-      row[column] = value
+      row[columns[index]] = value
     }
     return row
   })
 
   return { columns, rows }
+}
+
+function validateHeader(columns: readonly string[]): void {
+  const seen = new Set<string>()
+
+  for (const name of columns) {
+    if (name.length === 0) {
+      throw new Error('CSV header contains an empty column name')
+    }
+    if (seen.has(name)) {
+      throw new Error(`CSV header contains a duplicate column name: "${name}"`)
+    }
+    seen.add(name)
+  }
 }
 
 function detectDelimiter(text: string): string {

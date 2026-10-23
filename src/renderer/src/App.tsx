@@ -7,7 +7,7 @@ import { MappingEditor } from './components/MappingEditor'
 import { PianoRoll } from './components/PianoRoll'
 import { playNotes, type PlaybackHandle } from './lib/playback'
 
-type StatusKind = 'idle' | 'success' | 'error'
+type StatusKind = 'idle' | 'success' | 'warning' | 'error'
 
 interface Status {
   kind: StatusKind
@@ -31,6 +31,7 @@ function App(): React.JSX.Element {
   const [sourceName, setSourceName] = useState('sonification')
   const [status, setStatus] = useState<Status>(INITIAL_STATUS)
   const [busy, setBusy] = useState(false)
+  const [hasHeader, setHasHeader] = useState(true)
   const [savedPath, setSavedPath] = useState<string | null>(null)
   const [playing, setPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -126,7 +127,7 @@ function App(): React.JSX.Element {
     setStatus({ kind: 'idle', message: 'Waiting for a CSV file…' })
 
     try {
-      const result = await window.api.openCsv()
+      const result = await window.api.openCsv(hasHeader)
 
       if (result.canceled) {
         setStatus({ kind: 'idle', message: 'Open canceled.' })
@@ -146,8 +147,10 @@ function App(): React.JSX.Element {
       setSourceName(baseName(result.filePath))
       setSavedPath(null)
       setStatus({
-        kind: 'success',
-        message: `Loaded ${result.dataset.rows.length} rows and ${result.dataset.columns.length} columns.`
+        kind: result.warning ? 'warning' : 'success',
+        message: result.warning
+          ? `Loaded ${result.dataset.rows.length} rows. ${result.warning}`
+          : `Loaded ${result.dataset.rows.length} rows and ${result.dataset.columns.length} columns.`
       })
     } catch (error) {
       setStatus({ kind: 'error', message: toMessage(error) })
@@ -249,6 +252,17 @@ function App(): React.JSX.Element {
       <main className="workspace">
         <section className="panel toolbar">
           <div className="actions">
+            <label
+              className="header-toggle"
+              title="Uncheck if the first row contains data instead of column names"
+            >
+              <input
+                type="checkbox"
+                checked={hasHeader}
+                onChange={(event) => setHasHeader(event.target.checked)}
+              />
+              First row is header
+            </label>
             <button
               type="button"
               className="button button-primary"
@@ -376,7 +390,9 @@ function App(): React.JSX.Element {
               parameter.
             </p>
             <p className="empty-hint">
-              Try <code>data/weather.csv</code>.
+              Try <code>data/weather.csv</code>, <code>data/climate.csv</code>,{' '}
+              <code>data/finance.csv</code>, or <code>data/seismic.csv</code>. If your file has no
+              header row, uncheck “First row is header” before opening it.
             </p>
           </section>
         )}

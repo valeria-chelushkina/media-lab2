@@ -11,6 +11,7 @@ export interface OpenCsvResult {
   canceled: boolean
   filePath?: string
   dataset?: Dataset
+  warning?: string
   error?: string
 }
 
@@ -26,7 +27,7 @@ export interface OpenMidiResult {
 }
 
 export interface MediaLabApi {
-  openCsv: () => Promise<OpenCsvResult>
+  openCsv: (hasHeader?: boolean) => Promise<OpenCsvResult>
   saveMidi: (bytes: Uint8Array, defaultName?: string) => Promise<SaveMidiResult>
   openMidi: (filePath: string) => Promise<OpenMidiResult>
 }

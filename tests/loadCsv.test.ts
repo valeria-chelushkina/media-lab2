@@ -32,6 +32,32 @@ describe('parseCsv', () => {
     expect(dataset.rows[0]).toEqual({ temperature: 12.5, humidity: 65 })
   })
 
+  it('treats every row as data when header is false', () => {
+    const dataset = parseCsv('12,78\n13,80\n14,82\n', { header: false })
+
+    expect(dataset.columns).toEqual(['column1', 'column2'])
+    expect(dataset.rows).toEqual([
+      { column1: 12, column2: 78 },
+      { column1: 13, column2: 80 },
+      { column1: 14, column2: 82 }
+    ])
+  })
+
+  it('accepts a single headerless data row', () => {
+    const dataset = parseCsv('12,78,1014\n', { header: false })
+
+    expect(dataset.columns).toEqual(['column1', 'column2', 'column3'])
+    expect(dataset.rows).toEqual([{ column1: 12, column2: 78, column3: 1014 }])
+  })
+
+  it('rejects duplicate header names', () => {
+    expect(() => parseCsv('a,a,b\n1,2,3\n')).toThrow(/duplicate column name/)
+  })
+
+  it('rejects empty header names', () => {
+    expect(() => parseCsv('a,,c\n1,2,3\n')).toThrow(/empty column name/)
+  })
+
   it('rejects a non-numeric cell', () => {
     expect(() => parseCsv('temperature,humidity\n12.5,cold\n')).toThrow(/not a finite number/)
   })

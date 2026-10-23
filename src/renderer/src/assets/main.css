@@ -8,6 +8,7 @@
   --panel-border: #343642;
   --muted: #9aa0b4;
   --success: #7dd3a8;
+  --warning: #f6c177;
   --danger: #ff8f8f;
 }
 
@@ -108,7 +109,26 @@ body {
 .actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 10px;
+}
+
+.header-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  align-self: stretch;
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.header-toggle input {
+  width: auto;
+  accent-color: var(--accent-strong);
 }
 
 .button {
@@ -169,6 +189,10 @@ body {
 
 .status-error {
   color: var(--danger);
+}
+
+.status-warning {
+  color: var(--warning);
 }
 
 .content-grid {

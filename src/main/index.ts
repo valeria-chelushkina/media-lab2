@@ -47,7 +47,7 @@ function createWindow(): void {
 
 function registerIpcHandlers(): void {
   ipcMain.removeHandler(IPC.openCsv)
-  ipcMain.handle(IPC.openCsv, async (): Promise<OpenCsvResult> => {
+  ipcMain.handle(IPC.openCsv, async (_event, hasHeader = true): Promise<OpenCsvResult> => {
     const options: OpenDialogOptions = {
       title: 'Open numeric data',
       properties: ['openFile'],
@@ -63,9 +63,17 @@ function registerIpcHandlers(): void {
     }
 
     const filePath = result.filePaths[0]
+    const useHeader = hasHeader !== false
+
     try {
       const text = await readFile(filePath, 'utf8')
-      return { canceled: false, filePath, dataset: parseCsv(text) }
+      const dataset = parseCsv(text, { header: useHeader })
+      const warning =
+        useHeader && dataset.columns.every((column) => NUMERIC_COLUMN.test(column))
+          ? 'The first row looks like data. If this file has no header, turn off “First row is header” and reopen it.'
+          : undefined
+
+      return { canceled: false, filePath, dataset, warning }
     } catch (error) {
       return { canceled: false, filePath, error: toMessage(error) }
     }
@@ -129,6 +137,8 @@ function registerIpcHandlers(): void {
     }
   })
 }
+
+const NUMERIC_COLUMN = /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/
 
 function toMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error)
