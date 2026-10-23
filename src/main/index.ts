@@ -1,11 +1,11 @@
 import { app, shell, BrowserWindow, dialog, ipcMain } from 'electron'
 import type { OpenDialogOptions, SaveDialogOptions } from 'electron'
-import { readFile, writeFile } from 'node:fs/promises'
+import { readFile, writeFile, access } from 'node:fs/promises'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { parseCsv } from '../core/loadCsv'
-import { IPC, type OpenCsvResult, type SaveMidiResult } from '../shared/ipc'
+import { IPC, type OpenCsvResult, type SaveMidiResult, type OpenMidiResult } from '../shared/ipc'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -104,6 +104,30 @@ function registerIpcHandlers(): void {
       }
     }
   )
+
+  ipcMain.removeHandler(IPC.openMidi)
+  ipcMain.handle(IPC.openMidi, async (_event, filePath: string): Promise<OpenMidiResult> => {
+    if (typeof filePath !== 'string' || !/\.(mid|midi)$/i.test(filePath)) {
+      return { ok: false, error: 'Only .mid or .midi files can be opened.' }
+    }
+
+    try {
+      await access(filePath)
+      const error = await shell.openPath(filePath)
+
+      if (error) {
+        shell.showItemInFolder(filePath)
+        return {
+          ok: false,
+          error: `Could not open the file: ${error}. It was revealed in its folder instead.`
+        }
+      }
+
+      return { ok: true }
+    } catch (error) {
+      return { ok: false, error: toMessage(error) }
+    }
+  })
 }
 
 function toMessage(error: unknown): string {

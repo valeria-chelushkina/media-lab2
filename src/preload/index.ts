@@ -4,7 +4,8 @@ import { IPC, type MediaLabApi } from '../shared/ipc'
 
 const api: MediaLabApi = {
   openCsv: () => ipcRenderer.invoke(IPC.openCsv),
-  saveMidi: (bytes, defaultName) => ipcRenderer.invoke(IPC.saveMidi, bytes, defaultName)
+  saveMidi: (bytes, defaultName) => ipcRenderer.invoke(IPC.saveMidi, bytes, defaultName),
+  openMidi: (filePath) => ipcRenderer.invoke(IPC.openMidi, filePath)
 }
 
 if (process.contextIsolated) {

@@ -1,6 +1,6 @@
 {
   "name": "media-lab2",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "description": "Desktop app that turns numeric data into a MIDI composition",
   "private": true,
   "main": "./out/main/index.js",

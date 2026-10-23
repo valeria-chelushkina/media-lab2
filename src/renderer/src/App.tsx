@@ -1,15 +1,23 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { buildMidi } from '@core/buildMidi'
 import { createConfigForColumns, type SonificationConfig } from '@core/config'
 import { sonify } from '@core/sonify'
-import type { Dataset } from '@core/types'
+import type { Dataset, NoteEvent } from '@core/types'
 import { MappingEditor } from './components/MappingEditor'
+import { PianoRoll } from './components/PianoRoll'
+import { playNotes, type PlaybackHandle } from './lib/playback'
 
 type StatusKind = 'idle' | 'success' | 'error'
 
 interface Status {
   kind: StatusKind
   message: string
+}
+
+interface Preview {
+  notes: NoteEvent[]
+  error: string | null
+  durationSeconds: number
 }
 
 const INITIAL_STATUS: Status = {
@@ -23,6 +31,86 @@ function App(): React.JSX.Element {
   const [sourceName, setSourceName] = useState('sonification')
   const [status, setStatus] = useState<Status>(INITIAL_STATUS)
   const [busy, setBusy] = useState(false)
+  const [savedPath, setSavedPath] = useState<string | null>(null)
+  const [playing, setPlaying] = useState(false)
+  const [progress, setProgress] = useState(0)
+
+  const playbackRef = useRef<PlaybackHandle | null>(null)
+  const rafRef = useRef<number | null>(null)
+
+  const preview = useMemo<Preview>(() => {
+    if (!dataset || !config) {
+      return { notes: [], error: null, durationSeconds: 0 }
+    }
+
+    try {
+      const notes = sonify(dataset.rows, config)
+      const totalBeats = notes.reduce(
+        (max, note) => Math.max(max, note.timeBeats + note.durationBeats),
+        0
+      )
+      return {
+        notes,
+        error: null,
+        durationSeconds: (totalBeats * 60) / config.tempo
+      }
+    } catch (error) {
+      return { notes: [], error: toMessage(error), durationSeconds: 0 }
+    }
+  }, [dataset, config])
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
+      playbackRef.current?.stop()
+    }
+  }, [])
+
+  function stopPlayback(): void {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current)
+      rafRef.current = null
+    }
+    playbackRef.current?.stop()
+    playbackRef.current = null
+    setPlaying(false)
+    setProgress(0)
+  }
+
+  async function handlePlay(): Promise<void> {
+    if (playing) {
+      stopPlayback()
+      return
+    }
+    if (!config || preview.error || preview.notes.length === 0) return
+
+    stopPlayback()
+
+    try {
+      const handle = await playNotes(preview.notes, config.tempo)
+      playbackRef.current = handle
+      setPlaying(true)
+
+      const started = performance.now()
+      const totalMs = Math.max(1, handle.durationSeconds * 1000)
+
+      const tick = (now: number): void => {
+        const next = Math.min(1, (now - started) / totalMs)
+        setProgress(next)
+
+        if (next < 1) {
+          rafRef.current = requestAnimationFrame(tick)
+        } else {
+          stopPlayback()
+        }
+      }
+
+      rafRef.current = requestAnimationFrame(tick)
+    } catch (error) {
+      stopPlayback()
+      setStatus({ kind: 'error', message: toMessage(error) })
+    }
+  }
 
   async function handleOpenCsv(): Promise<void> {
     if (!window.api) {
@@ -33,6 +121,7 @@ function App(): React.JSX.Element {
       return
     }
 
+    stopPlayback()
     setBusy(true)
     setStatus({ kind: 'idle', message: 'Waiting for a CSV file…' })
 
@@ -55,6 +144,7 @@ function App(): React.JSX.Element {
       setDataset(result.dataset)
       setConfig(createConfigForColumns(result.dataset.columns))
       setSourceName(baseName(result.filePath))
+      setSavedPath(null)
       setStatus({
         kind: 'success',
         message: `Loaded ${result.dataset.rows.length} rows and ${result.dataset.columns.length} columns.`
@@ -69,6 +159,7 @@ function App(): React.JSX.Element {
   async function handleGenerate(): Promise<void> {
     if (!dataset || !config || !window.api) return
 
+    stopPlayback()
     setBusy(true)
     setStatus({ kind: 'idle', message: 'Generating MIDI…' })
 
@@ -90,6 +181,7 @@ function App(): React.JSX.Element {
         return
       }
 
+      setSavedPath(result.filePath ?? null)
       setStatus({
         kind: 'success',
         message: `Saved ${notes.length} notes to ${result.filePath ?? 'the selected file'}.`
@@ -101,8 +193,40 @@ function App(): React.JSX.Element {
     }
   }
 
+  async function handleOpenSaved(): Promise<void> {
+    if (!savedPath || !window.api) return
+
+    try {
+      const result = await window.api.openMidi(savedPath)
+      if (result.error) {
+        setStatus({ kind: 'error', message: result.error })
+        return
+      }
+      setStatus({
+        kind: 'success',
+        message: `Opened ${savedPath} in the default player.`
+      })
+    } catch (error) {
+      setStatus({ kind: 'error', message: toMessage(error) })
+    }
+  }
+
+  function handleConfigChange(next: SonificationConfig): void {
+    if (playing) stopPlayback()
+    if (savedPath) {
+      setSavedPath(null)
+      setStatus({
+        kind: 'idle',
+        message: 'Mapping changed. Generate again to update the .mid file.'
+      })
+    }
+    setConfig(next)
+  }
+
   function handleReset(): void {
     if (!dataset) return
+    stopPlayback()
+    setSavedPath(null)
     setConfig(createConfigForColumns(dataset.columns))
     setStatus({ kind: 'idle', message: 'Mapping reset to defaults.' })
   }
@@ -141,11 +265,56 @@ function App(): React.JSX.Element {
             >
               Generate &amp; Save .mid
             </button>
+            {savedPath ? (
+              <button
+                type="button"
+                className="button"
+                onClick={() => void handleOpenSaved()}
+                disabled={busy}
+                title="Open the saved .mid in the default MIDI application"
+              >
+                Open in player
+              </button>
+            ) : null}
           </div>
           <p className={`status status-${status.kind}`} role="status" aria-live="polite">
             {status.message}
           </p>
         </section>
+
+        {dataset && config ? (
+          <section className="panel preview-panel">
+            <div className="panel-heading preview-heading">
+              <div className="preview-title">
+                <h2>Piano roll</h2>
+                <span>
+                  {preview.error
+                    ? 'Mapping error'
+                    : `${preview.notes.length} notes · ${preview.durationSeconds.toFixed(2)} s`}
+                </span>
+              </div>
+              <button
+                type="button"
+                className="button button-primary preview-play"
+                onClick={() => void handlePlay()}
+                disabled={preview.notes.length === 0 || Boolean(preview.error)}
+              >
+                {playing ? 'Stop' : 'Play'}
+              </button>
+            </div>
+
+            <p className="preview-note">
+              Synth preview only. The saved <code>.mid</code> uses General MIDI and may sound
+              different in a DAW or online player.
+            </p>
+
+            {preview.error ? (
+              <p className="preview-error">{preview.error}</p>
+            ) : (
+              <PianoRoll notes={preview.notes} progress={progress} />
+            )}
+          </section>
+        ) : null}
 
         {dataset && config ? (
           <div className="content-grid">
@@ -194,7 +363,7 @@ function App(): React.JSX.Element {
               <MappingEditor
                 columns={dataset.columns}
                 config={config}
-                onChange={(next) => setConfig(next)}
+                onChange={handleConfigChange}
               />
             </section>
           </div>
@@ -213,7 +382,7 @@ function App(): React.JSX.Element {
         )}
       </main>
 
-      <footer className="app-footer">v0.2.0 · local desktop app · MIDI output</footer>
+      <footer className="app-footer">v0.4.0 · local desktop app · MIDI output</footer>
     </div>
   )
 }
