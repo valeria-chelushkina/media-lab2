@@ -15,7 +15,5 @@ export interface NoteEvent {
 
 export interface MidiBuildOptions {
   tempo: number
-  // Time signature as [numerator, denominator]. Defaults to 4/4.
-  timeSignature?: readonly [number, number]
   trackName?: string
 }

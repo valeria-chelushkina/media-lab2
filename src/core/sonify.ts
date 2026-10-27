@@ -3,7 +3,7 @@ import { lerp, makeNormalizer } from './normalize'
 import { toMidiNote } from './scale'
 import type { NoteEvent, NumericRow } from './types'
 
-// Converts numeric rows into note events.
+// сonverts rows into note events.
 export function sonify(rows: readonly NumericRow[], config: SonificationConfig): NoteEvent[] {
   const cfg = sonificationConfigSchema.parse(config)
 
@@ -49,6 +49,7 @@ export function sonify(rows: readonly NumericRow[], config: SonificationConfig):
   })
 }
 
+// builds array of numbers for 1 field from thw rows
 function series(rows: readonly NumericRow[], field: string): number[] {
   return rows.map((row, index) => {
     const value = row[field]

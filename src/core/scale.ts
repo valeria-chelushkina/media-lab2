@@ -21,9 +21,9 @@ export const SCALE_PRESETS: readonly ScalePreset[] = [
 ]
 
 /**
- * Maps a normalized value in [0, 1] to a MIDI note inside a scale.
+ * maps normalized value to a MIDI note
  *
- * Using a scale instead of raw semitones keeps the result musical while
+ * using a scale instead of raw semitones keeps the result musical while
  * preserving the ordering: a larger input value always produces a note
  * that is equal to or higher than the previous one.
  */

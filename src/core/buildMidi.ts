@@ -1,12 +1,12 @@
 import { Midi } from '@tonejs/midi'
 import type { MidiBuildOptions, NoteEvent } from './types'
 
-/** MIDI channels 0-15, excluding channel 9 (reserved for percussion). */
+// MIDI channels 0-15, excluding channel 9 (reserved for percussion)
 const MELODIC_CHANNELS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15]
 
 /**
  * Builds a MIDI file from note events. Notes are grouped by instrument, so a
- * row-by-row instrument mapping produces one track per General MIDI program.
+ *  row-by-row instrument mapping produces one track per General MIDI program.
  */
 export function buildMidi(notes: readonly NoteEvent[], options: MidiBuildOptions): Midi {
   if (notes.length === 0) {
@@ -19,8 +19,7 @@ export function buildMidi(notes: readonly NoteEvent[], options: MidiBuildOptions
   const midi = new Midi()
   midi.header.setTempo(options.tempo)
 
-  const [numerator, denominator] = options.timeSignature ?? [4, 4]
-  midi.header.timeSignatures = [{ ticks: 0, timeSignature: [numerator, denominator] }]
+  midi.header.timeSignatures = [{ ticks: 0, timeSignature: [4, 4] }]
   midi.header.update()
 
   const secondsPerBeat = 60 / options.tempo
@@ -58,7 +57,7 @@ export function buildMidi(notes: readonly NoteEvent[], options: MidiBuildOptions
   return midi
 }
 
-/** Serializes a Midi object into the bytes of a Standard MIDI File. */
+// serializes a Midi object into the bytes of a Standard MIDI File.
 export function midiToBytes(midi: Midi): Uint8Array {
   return midi.toArray()
 }

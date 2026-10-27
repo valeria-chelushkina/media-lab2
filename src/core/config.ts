@@ -70,7 +70,7 @@ export type SonificationConfig = z.infer<typeof sonificationConfigSchema>
 export type TimeMapping = NonNullable<SonificationConfig['time']>
 export type InstrumentMapping = NonNullable<SonificationConfig['instrument']>
 
-// Default mapping for data/weather.csv.
+// default mapping for data/weather.csv.
 export const defaultConfig: SonificationConfig = {
   tempo: 100,
   beatsPerRow: 1,
