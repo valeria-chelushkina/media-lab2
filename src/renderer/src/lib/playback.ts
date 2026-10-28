@@ -1,16 +1,6 @@
 import * as Tone from 'tone'
 import type { NoteEvent } from '@core/types'
-
-interface PlaybackVoice {
-  trigger: (frequency: string, duration: number, time: number, velocity: number) => void
-  releaseAll: () => void
-  dispose: () => void
-}
-
-export interface PlaybackHandle {
-  durationSeconds: number
-  stop: () => void
-}
+import type { PlaybackVoice, PlaybackHandle } from '@renderer/typedefs/playback.typedefs';
 
 /**
  * Schedules note events on Tone.Transport and starts playback.

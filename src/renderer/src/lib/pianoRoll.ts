@@ -1,5 +1,6 @@
 import type { NoteEvent } from '@core/types'
 import { midiName } from './midi'
+import type { PianoRollGeometry, BeatLine, OctaveLine, NoteRect } from '@renderer/typedefs/pianoRoll.typedefs';
 
 export const PIANO_ROLL_HEIGHT = 240
 export const PIANO_ROLL_PADDING = {
@@ -19,39 +20,6 @@ const COLORS = [
   '#96709f',
   '#6b8f70'
 ]
-
-export interface NoteRect {
-  key: string
-  x: number
-  y: number
-  width: number
-  height: number
-  color: string
-  opacity: number
-  label: string
-}
-
-export interface BeatLine {
-  beat: number
-  x: number
-  label: string | null
-}
-
-export interface OctaveLine {
-  midi: number
-  y: number
-  label: string
-}
-
-export interface PianoRollGeometry {
-  plotWidth: number
-  plotHeight: number
-  beatLines: BeatLine[]
-  octaveLines: OctaveLine[]
-  noteRects: NoteRect[]
-  programs: number[]
-  colorByProgram: Map<number, string>
-}
 
 export function buildPianoRollGeometry(
   notes: readonly NoteEvent[],
