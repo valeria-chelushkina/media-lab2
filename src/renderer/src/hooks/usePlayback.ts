@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { NoteEvent } from '@core/types'
 import { toMessage } from '../lib/format'
 import { playNotes, type PlaybackHandle } from '../lib/playback'
+import type { UsePlaybackProps } from '../typedefs/usePlayback'
 
 export interface PlaybackControls {
   playing: boolean
@@ -10,7 +11,7 @@ export interface PlaybackControls {
   stop: () => void
 }
 
-export function usePlayback(onError?: (message: string) => void): PlaybackControls {
+export function usePlayback({ onError }: UsePlaybackProps): PlaybackControls {
   const [playing, setPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
   const playbackRef = useRef<PlaybackHandle | null>(null)

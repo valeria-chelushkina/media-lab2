@@ -1,8 +1,5 @@
 import { useMemo, useState } from 'react'
-import { buildMidi } from '@core/buildMidi'
 import { createConfigForColumns, unmappedFields, type SonificationConfig } from '@core/config'
-import { getSamplePreset } from '@core/presets'
-import { sonify } from '@core/sonify'
 import type { Dataset } from '@core/types'
 import { AppHeader } from './components/AppHeader'
 import { DatasetPanel } from './components/DatasetPanel'
@@ -10,10 +7,14 @@ import { EmptyState } from './components/EmptyState'
 import { MappingPanel } from './components/MappingPanel'
 import { PreviewPanel } from './components/PreviewPanel'
 import { Toolbar } from './components/Toolbar'
+import { useGenerateMidi } from './hooks/useGenerateMidi'
+import { useLoadSample } from './hooks/useLoadSample'
+import { useOpenCsv } from './hooks/useOpenCsv'
+import { useOpenSavedMidi } from './hooks/useOpenSavedMidi'
 import { usePlayback } from './hooks/usePlayback'
-import { baseName, toMessage } from './lib/format'
+import { usePlaybackTrigger } from './hooks/usePlaybackTrigger'
 import { buildPreview } from './lib/preview'
-import type { Status } from './types'
+import type { LoadedDataset, Status } from './types'
 
 const INITIAL_STATUS: Status = {
   kind: 'idle',
@@ -29,153 +30,52 @@ function App(): React.JSX.Element {
   const [hasHeader, setHasHeader] = useState(true)
   const [savedPath, setSavedPath] = useState<string | null>(null)
 
-  const { playing, progress, play, stop } = usePlayback((message) =>
-    setStatus({ kind: 'error', message })
-  )
-
   const preview = useMemo(() => buildPreview(dataset, config), [dataset, config])
   const unmapped = dataset && config ? unmappedFields(dataset.columns, config) : []
 
-  async function handlePlay(): Promise<void> {
-    if (!config || preview.error || preview.notes.length === 0) return
-    await play(preview.notes, config.tempo)
+  function handleLoaded(payload: LoadedDataset): void {
+    setDataset(payload.dataset)
+    setConfig(payload.config)
+    setSourceName(payload.sourceName)
+    setHasHeader(payload.hasHeader)
+    setSavedPath(null)
   }
 
-  async function handleOpenCsv(): Promise<void> {
-    if (!window.api) {
-      setStatus({
-        kind: 'error',
-        message: 'Preload bridge is unavailable. Launch the app through Electron.'
-      })
-      return
-    }
+  const { playing, progress, play, stop } = usePlayback({
+    onError: (message) => setStatus({ kind: 'error', message })
+  })
 
-    stop()
-    setBusy(true)
-    setStatus({ kind: 'idle', message: 'Waiting for a CSV file…' })
+  const openCsv = useOpenCsv({
+    hasHeader,
+    stopPlayback: stop,
+    setBusy,
+    setStatus,
+    onLoaded: handleLoaded
+  })
 
-    try {
-      const result = await window.api.openCsv(hasHeader)
+  const loadSample = useLoadSample({
+    stopPlayback: stop,
+    setBusy,
+    setStatus,
+    onLoaded: handleLoaded
+  })
 
-      if (result.canceled) {
-        setStatus({ kind: 'idle', message: 'Open canceled.' })
-        return
-      }
+  const generate = useGenerateMidi({
+    dataset,
+    config,
+    sourceName,
+    stopPlayback: stop,
+    setBusy,
+    setStatus,
+    setSavedPath
+  })
 
-      if (result.error || !result.dataset) {
-        setStatus({
-          kind: 'error',
-          message: result.error ?? 'The selected file did not contain a dataset.'
-        })
-        return
-      }
+  const openSaved = useOpenSavedMidi({
+    savedPath,
+    setStatus
+  })
 
-      setDataset(result.dataset)
-      setConfig(createConfigForColumns(result.dataset.columns))
-      setSourceName(baseName(result.filePath))
-      setSavedPath(null)
-      setStatus({
-        kind: result.warning ? 'warning' : 'success',
-        message: result.warning
-          ? `Loaded ${result.dataset.rows.length} rows. ${result.warning}`
-          : `Loaded ${result.dataset.rows.length} rows and ${result.dataset.columns.length} columns.`
-      })
-    } catch (error) {
-      setStatus({ kind: 'error', message: toMessage(error) })
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  async function handleLoadSample(presetId: string): Promise<void> {
-    const preset = getSamplePreset(presetId)
-    if (!preset || !window.api) return
-
-    stop()
-    setBusy(true)
-    setStatus({ kind: 'idle', message: `Loading ${preset.name}…` })
-
-    try {
-      const result = await window.api.openSample(presetId)
-
-      if (result.error || !result.dataset) {
-        setStatus({
-          kind: 'error',
-          message: result.error ?? 'The sample could not be loaded.'
-        })
-        return
-      }
-
-      setDataset(result.dataset)
-      setConfig(structuredClone(preset.config))
-      setSourceName(baseName(preset.file))
-      setHasHeader(preset.header)
-      setSavedPath(null)
-      setStatus({
-        kind: 'success',
-        message: `Loaded ${preset.name}: ${result.dataset.rows.length} rows, ${result.dataset.columns.length} columns.`
-      })
-    } catch (error) {
-      setStatus({ kind: 'error', message: toMessage(error) })
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  async function handleGenerate(): Promise<void> {
-    if (!dataset || !config || !window.api) return
-
-    stop()
-    setBusy(true)
-    setStatus({ kind: 'idle', message: 'Generating MIDI…' })
-
-    try {
-      const notes = sonify(dataset.rows, config)
-      const midi = buildMidi(notes, {
-        tempo: config.tempo,
-        trackName: `${sourceName} sonification`
-      })
-      const result = await window.api.saveMidi(midi.toArray(), `${sourceName}.mid`)
-
-      if (result.canceled) {
-        setStatus({ kind: 'idle', message: 'Save canceled.' })
-        return
-      }
-
-      if (result.error) {
-        setStatus({ kind: 'error', message: result.error })
-        return
-      }
-
-      setSavedPath(result.filePath ?? null)
-      setStatus({
-        kind: 'success',
-        message: `Saved ${notes.length} notes to ${result.filePath ?? 'the selected file'}.`
-      })
-    } catch (error) {
-      setStatus({ kind: 'error', message: toMessage(error) })
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  async function handleOpenSaved(): Promise<void> {
-    if (!savedPath || !window.api) return
-
-    try {
-      const result = await window.api.openMidi(savedPath)
-      if (result.error) {
-        setStatus({ kind: 'error', message: result.error })
-        return
-      }
-      setStatus({
-        kind: 'success',
-        message: `Opened ${savedPath} in the default player.`
-      })
-    } catch (error) {
-      setStatus({ kind: 'error', message: toMessage(error) })
-    }
-  }
+  const handlePlay = usePlaybackTrigger({ preview, config, play })
 
   function handleConfigChange(next: SonificationConfig): void {
     if (playing) stop()
@@ -209,10 +109,10 @@ function App(): React.JSX.Element {
           canGenerate={Boolean(dataset && config)}
           hasSavedFile={Boolean(savedPath)}
           onHasHeaderChange={setHasHeader}
-          onOpenCsv={() => void handleOpenCsv()}
-          onLoadSample={(presetId) => void handleLoadSample(presetId)}
-          onGenerate={() => void handleGenerate()}
-          onOpenSaved={() => void handleOpenSaved()}
+          onOpenCsv={() => void openCsv()}
+          onLoadSample={(presetId) => void loadSample(presetId)}
+          onGenerate={() => void generate()}
+          onOpenSaved={() => void openSaved()}
         />
 
         {dataset && config ? (
@@ -236,7 +136,7 @@ function App(): React.JSX.Element {
             </div>
           </>
         ) : (
-          <EmptyState busy={busy} onLoadSample={(presetId) => void handleLoadSample(presetId)} />
+          <EmptyState busy={busy} onLoadSample={(presetId) => void loadSample(presetId)} />
         )}
       </main>
     </div>

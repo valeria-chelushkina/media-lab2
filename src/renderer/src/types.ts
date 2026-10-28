@@ -1,4 +1,5 @@
-import type { NoteEvent } from '@core/types'
+import type { SonificationConfig } from '@core/config'
+import type { Dataset, NoteEvent } from '@core/types'
 
 export type StatusKind = 'idle' | 'success' | 'warning' | 'error'
 
@@ -11,4 +12,11 @@ export interface Preview {
   notes: NoteEvent[]
   error: string | null
   durationSeconds: number
+}
+
+export interface LoadedDataset {
+  dataset: Dataset
+  config: SonificationConfig
+  sourceName: string
+  hasHeader: boolean
 }
