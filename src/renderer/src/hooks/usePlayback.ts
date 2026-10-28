@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { NoteEvent } from '@core/types'
 import { toMessage } from '../lib/format'
 import { playNotes, type PlaybackHandle } from '../lib/playback'
-import type { UsePlaybackProps } from '../typedefs/usePlayback'
+import type { UsePlaybackProps } from '../typedefs/usePlayback.typedefs'
 
 export interface PlaybackControls {
   playing: boolean

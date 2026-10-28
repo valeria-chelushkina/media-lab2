@@ -1,7 +1,7 @@
 import { buildMidi } from '@core/buildMidi'
 import { sonify } from '@core/sonify'
 import { toMessage } from '../lib/format'
-import type { UseGenerateMidiProps } from '../typedefs/useGenerateMidi'
+import type { UseGenerateMidiProps } from '../typedefs/useGenerateMidi.typedefs'
 
 export function useGenerateMidi({
   dataset,

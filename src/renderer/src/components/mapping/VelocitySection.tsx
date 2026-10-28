@@ -1,4 +1,4 @@
-import type { MappingSectionProps } from '../../typedefs/mapping'
+import type { MappingSectionProps } from '../../typedefs/mapping.typedefs'
 import { ColumnSelect } from './ColumnSelect'
 import { Field } from './Field'
 import { MappingSection } from './MappingSection'

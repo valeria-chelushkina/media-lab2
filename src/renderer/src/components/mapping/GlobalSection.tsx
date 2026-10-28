@@ -1,4 +1,4 @@
-import type { GlobalSectionProps } from '../../typedefs/mapping'
+import type { GlobalSectionProps } from '../../typedefs/mapping.typedefs'
 import { Field } from './Field'
 import { MappingSection } from './MappingSection'
 import { NumberInput } from './NumberInput'

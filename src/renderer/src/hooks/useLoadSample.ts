@@ -1,6 +1,6 @@
 import { getSamplePreset } from '@core/presets'
 import { baseName, toMessage } from '../lib/format'
-import type { UseLoadSampleProps } from '../typedefs/useLoadSample'
+import type { UseLoadSampleProps } from '../typedefs/useLoadSample.typedefs'
 
 export function useLoadSample({
   stopPlayback,

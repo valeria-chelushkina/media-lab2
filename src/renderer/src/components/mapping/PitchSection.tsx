@@ -1,5 +1,5 @@
 import { SCALE_PRESETS } from '@core/scale'
-import type { MappingSectionProps } from '../../typedefs/mapping'
+import type { MappingSectionProps } from '../../typedefs/mapping.typedefs'
 import { ROOT_NOTE_OPTIONS } from '../../lib/midi'
 import { ColumnSelect } from './ColumnSelect'
 import { Field } from './Field'

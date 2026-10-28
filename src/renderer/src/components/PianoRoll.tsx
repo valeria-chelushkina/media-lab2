@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { instrumentName } from '@core/instruments'
 import { buildPianoRollGeometry, PIANO_ROLL_HEIGHT, PIANO_ROLL_PADDING } from '../lib/pianoRoll'
-import type { PianoRollProps } from '../typedefs/pianoRoll'
+import type { PianoRollProps } from '../typedefs/pianoRoll.typedefs'
 
 export function PianoRoll({ notes, progress }: PianoRollProps): React.JSX.Element {
   const containerRef = useRef<HTMLDivElement>(null)

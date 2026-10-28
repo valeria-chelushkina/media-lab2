@@ -1,4 +1,4 @@
-import type { FieldProps } from '../../typedefs/mapping'
+import type { FieldProps } from '../../typedefs/mapping.typedefs'
 
 export function Field({ label, children, wide = false }: FieldProps): React.JSX.Element {
   return (

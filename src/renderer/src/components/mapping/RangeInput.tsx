@@ -1,4 +1,4 @@
-import type { RangeInputProps } from '../../typedefs/mapping'
+import type { RangeInputProps } from '../../typedefs/mapping.typedefs'
 import { NumberInput } from './NumberInput'
 
 export function RangeInput({

@@ -1,6 +1,6 @@
 import { createConfigForColumns } from '@core/config'
 import { baseName, toMessage } from '../lib/format'
-import type { UseOpenCsvProps } from '../typedefs/useOpenCsv'
+import type { UseOpenCsvProps } from '../typedefs/useOpenCsv.typedefs'
 
 export function useOpenCsv({
   hasHeader,

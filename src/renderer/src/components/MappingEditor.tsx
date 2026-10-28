@@ -1,4 +1,4 @@
-import type { MappingEditorProps } from '../typedefs/mapping'
+import type { MappingEditorProps } from '../typedefs/mapping.typedefs'
 import { DurationSection } from './mapping/DurationSection'
 import { GlobalSection } from './mapping/GlobalSection'
 import { InstrumentSection } from './mapping/InstrumentSection'
