@@ -1,9 +1,5 @@
 import { SAMPLE_PRESETS } from '@core/presets'
-
-interface EmptyStateProps {
-  busy: boolean
-  onLoadSample: (presetId: string) => void
-}
+import type { EmptyStateProps } from '@renderer/typedefs/emptyState.typedefs'
 
 export function EmptyState({ busy, onLoadSample }: EmptyStateProps): React.JSX.Element {
   return (

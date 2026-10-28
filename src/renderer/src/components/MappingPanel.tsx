@@ -1,13 +1,5 @@
-import type { SonificationConfig } from '@core/config'
-import type { Dataset } from '@core/types'
 import { MappingEditor } from '@renderer/components/MappingEditor'
-interface MappingPanelProps {
-  dataset: Dataset
-  config: SonificationConfig
-  unmapped: string[]
-  onConfigChange: (config: SonificationConfig) => void
-  onReset: () => void
-}
+import type { MappingPanelProps } from '@renderer/typedefs/mappingPanel.typedefs'
 
 export function MappingPanel({
   dataset,

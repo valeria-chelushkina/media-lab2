@@ -1,11 +1,5 @@
 import { PianoRoll } from '@renderer/components/PianoRoll'
-import type { Preview } from '@renderer/types'
-interface PreviewPanelProps {
-  preview: Preview
-  playing: boolean
-  progress: number
-  onPlay: () => void
-}
+import type { PreviewPanelProps } from '@renderer/typedefs/previewPanel.typedefs'
 
 export function PreviewPanel({
   preview,

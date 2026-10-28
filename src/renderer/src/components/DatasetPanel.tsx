@@ -1,8 +1,5 @@
-import type { Dataset } from '@core/types'
 import { formatNumber } from '@renderer/lib/format'
-interface DatasetPanelProps {
-  dataset: Dataset
-}
+import type { DatasetPanelProps } from '@renderer/typedefs/datasetPanel.typedefs'
 
 export function DatasetPanel({ dataset }: DatasetPanelProps): React.JSX.Element {
   return (
