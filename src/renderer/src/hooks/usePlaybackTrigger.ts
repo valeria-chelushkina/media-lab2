@@ -1,6 +1,5 @@
 import { useCallback } from 'react'
-import type { UsePlaybackTriggerProps } from '../typedefs/usePlaybackTrigger.typedefs'
-
+import type { UsePlaybackTriggerProps } from '@renderer/typedefs/usePlaybackTrigger.typedefs'
 export function usePlaybackTrigger({
   preview,
   config,

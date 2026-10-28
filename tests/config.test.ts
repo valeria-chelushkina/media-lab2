@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createConfigForColumns, defaultConfig, unmappedFields } from '../src/core/config'
-
+import { createConfigForColumns, defaultConfig, unmappedFields } from '@core/config'
 describe('createConfigForColumns', () => {
   it('maps the first three columns to pitch, velocity and duration', () => {
     const config = createConfigForColumns(['open', 'high', 'low'])

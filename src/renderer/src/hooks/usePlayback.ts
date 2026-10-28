@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { NoteEvent } from '@core/types'
-import { toMessage } from '../lib/format'
-import { playNotes } from '../lib/playback'
-import type { PlaybackHandle } from '../typedefs/playback.typedefs';
-import type { UsePlaybackProps } from '../typedefs/usePlayback.typedefs'
-
+import { toMessage } from '@renderer/lib/format'
+import { playNotes } from '@renderer/lib/playback'
+import type { PlaybackHandle } from '@renderer/typedefs/playback.typedefs'
+import type { UsePlaybackProps } from '@renderer/typedefs/usePlayback.typedefs'
 export interface PlaybackControls {
   playing: boolean
   progress: number

@@ -1,6 +1,6 @@
 import * as Tone from 'tone'
 import type { NoteEvent } from '@core/types'
-import type { PlaybackVoice, PlaybackHandle } from '@renderer/typedefs/playback.typedefs';
+import type { PlaybackVoice, PlaybackHandle } from '@renderer/typedefs/playback.typedefs'
 
 /**
  * Schedules note events on Tone.Transport and starts playback.

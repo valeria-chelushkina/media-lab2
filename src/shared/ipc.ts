@@ -1,5 +1,4 @@
-import type { Dataset } from '../core/types'
-
+import type { Dataset } from '@core/types'
 export const IPC = {
   openCsv: 'csv:open',
   openSample: 'sample:open',

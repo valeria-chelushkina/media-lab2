@@ -1,5 +1,4 @@
-import { clamp01 } from './normalize'
-
+import { clamp01 } from '@core/normalize'
 // C major pentatonic: C, D, E, G, A
 export const MAJOR_PENTATONIC: readonly number[] = [0, 2, 4, 7, 9]
 

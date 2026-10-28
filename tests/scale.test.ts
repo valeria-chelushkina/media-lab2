@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { MAJOR_PENTATONIC, toMidiNote } from '../src/core/scale'
-
+import { MAJOR_PENTATONIC, toMidiNote } from '@core/scale'
 describe('toMidiNote', () => {
   it('maps 0 to the root note and 1 to the highest degree', () => {
     expect(toMidiNote(0, 60, 2, MAJOR_PENTATONIC)).toBe(60)

@@ -1,6 +1,5 @@
-import type { RangeInputProps } from '../../typedefs/mapping.typedefs'
-import { NumberInput } from './NumberInput'
-
+import type { RangeInputProps } from '@renderer/typedefs/mapping.typedefs'
+import { NumberInput } from '@renderer/components/mapping/NumberInput'
 export function RangeInput({
   minValue,
   maxValue,

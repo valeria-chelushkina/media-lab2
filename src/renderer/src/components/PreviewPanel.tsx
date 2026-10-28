@@ -1,6 +1,5 @@
-import { PianoRoll } from './PianoRoll'
-import type { Preview } from '../types'
-
+import { PianoRoll } from '@renderer/components/PianoRoll'
+import type { Preview } from '@renderer/types'
 interface PreviewPanelProps {
   preview: Preview
   playing: boolean

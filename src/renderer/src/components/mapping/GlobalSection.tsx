@@ -1,8 +1,7 @@
-import type { GlobalSectionProps } from '../../typedefs/mapping.typedefs'
-import { Field } from './Field'
-import { MappingSection } from './MappingSection'
-import { NumberInput } from './NumberInput'
-
+import type { GlobalSectionProps } from '@renderer/typedefs/mapping.typedefs'
+import { Field } from '@renderer/components/mapping/Field'
+import { MappingSection } from '@renderer/components/mapping/MappingSection'
+import { NumberInput } from '@renderer/components/mapping/NumberInput'
 export function GlobalSection({ config, onChange }: GlobalSectionProps): React.JSX.Element {
   return (
     <MappingSection title="Global">

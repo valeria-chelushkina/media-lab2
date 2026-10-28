@@ -1,6 +1,11 @@
 import type { NoteEvent } from '@core/types'
-import { midiName } from './midi'
-import type { PianoRollGeometry, BeatLine, OctaveLine, NoteRect } from '@renderer/typedefs/pianoRoll.typedefs';
+import { midiName } from '@renderer/lib/midi'
+import type {
+  PianoRollGeometry,
+  BeatLine,
+  OctaveLine,
+  NoteRect
+} from '@renderer/typedefs/pianoRoll.typedefs'
 
 export const PIANO_ROLL_HEIGHT = 240
 export const PIANO_ROLL_PADDING = {

@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { defaultConfig, type SonificationConfig } from '../src/core/config'
-import { sonify } from '../src/core/sonify'
-import type { NumericRow } from '../src/core/types'
-
+import { defaultConfig, type SonificationConfig } from '@core/config'
+import { sonify } from '@core/sonify'
+import type { NumericRow } from '@core/types'
 const rows: NumericRow[] = [
   { temperature: 10, humidity: 40, pressure: 1000 },
   { temperature: 20, humidity: 60, pressure: 1010 },

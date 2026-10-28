@@ -1,6 +1,5 @@
 import type { Dataset } from '@core/types'
-import { formatNumber } from '../lib/format'
-
+import { formatNumber } from '@renderer/lib/format'
 interface DatasetPanelProps {
   dataset: Dataset
 }

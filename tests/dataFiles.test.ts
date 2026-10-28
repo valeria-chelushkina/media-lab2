@@ -1,11 +1,10 @@
 import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { buildMidi } from '../src/core/buildMidi'
-import { createConfigForColumns } from '../src/core/config'
-import { parseCsv } from '../src/core/loadCsv'
-import { sonify } from '../src/core/sonify'
-
+import { buildMidi } from '@core/buildMidi'
+import { createConfigForColumns } from '@core/config'
+import { parseCsv } from '@core/loadCsv'
+import { sonify } from '@core/sonify'
 const dataDirectory = join(process.cwd(), 'data')
 
 describe('bundled sample datasets', () => {

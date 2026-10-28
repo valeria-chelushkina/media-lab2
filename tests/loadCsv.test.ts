@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseCsv } from '../src/core/loadCsv'
-
+import { parseCsv } from '@core/loadCsv'
 describe('parseCsv', () => {
   it('parses a comma-separated numeric CSV', () => {
     const dataset = parseCsv('temperature,humidity\n12.5,65\n13.1,63\n')

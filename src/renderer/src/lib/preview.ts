@@ -1,9 +1,8 @@
 import type { SonificationConfig } from '@core/config'
 import { sonify } from '@core/sonify'
 import type { Dataset } from '@core/types'
-import type { Preview } from '../types'
-import { toMessage } from './format'
-
+import type { Preview } from '@renderer/types'
+import { toMessage } from '@renderer/lib/format'
 export function buildPreview(dataset: Dataset | null, config: SonificationConfig | null): Preview {
   if (!dataset || !config) {
     return { notes: [], error: null, durationSeconds: 0 }

@@ -1,7 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import { IPC, type MediaLabApi } from '../shared/ipc'
-
+import { IPC, type MediaLabApi } from '@shared/ipc'
 const api: MediaLabApi = {
   openCsv: (hasHeader) => ipcRenderer.invoke(IPC.openCsv, hasHeader),
   openSample: (presetId) => ipcRenderer.invoke(IPC.openSample, presetId),

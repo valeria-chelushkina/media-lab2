@@ -1,6 +1,5 @@
 import { SAMPLE_PRESETS } from '@core/presets'
-import type { Status } from '../types'
-
+import type { Status } from '@renderer/types'
 interface ToolbarProps {
   hasHeader: boolean
   status: Status

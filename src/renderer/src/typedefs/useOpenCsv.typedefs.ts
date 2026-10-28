@@ -1,5 +1,4 @@
-import type { LoadedDataset, Status } from '../types'
-
+import type { LoadedDataset, Status } from '@renderer/types'
 export interface UseOpenCsvProps {
   hasHeader: boolean
   stopPlayback: () => void

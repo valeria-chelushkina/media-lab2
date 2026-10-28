@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { makeNormalizer } from '../src/core/normalize'
-
+import { makeNormalizer } from '@core/normalize'
 describe('makeNormalizer', () => {
   it('maps the observed minimum and maximum to 0 and 1', () => {
     const normalize = makeNormalizer([10, 20, 30])

@@ -1,6 +1,5 @@
 import { parse } from 'csv-parse/sync'
-import type { Dataset, NumericRow } from './types'
-
+import type { Dataset, NumericRow } from '@core/types'
 export interface CsvOptions {
   delimiter?: string
   header?: boolean

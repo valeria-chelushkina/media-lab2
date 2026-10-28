@@ -1,9 +1,8 @@
-import type { MappingSectionProps } from '../../typedefs/mapping.typedefs'
-import { ColumnSelect } from './ColumnSelect'
-import { Field } from './Field'
-import { MappingSection } from './MappingSection'
-import { RangeInput } from './RangeInput'
-
+import type { MappingSectionProps } from '@renderer/typedefs/mapping.typedefs'
+import { ColumnSelect } from '@renderer/components/mapping/ColumnSelect'
+import { Field } from '@renderer/components/mapping/Field'
+import { MappingSection } from '@renderer/components/mapping/MappingSection'
+import { RangeInput } from '@renderer/components/mapping/RangeInput'
 export function DurationSection({
   columns,
   config,

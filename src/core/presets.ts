@@ -1,6 +1,5 @@
-import type { SonificationConfig } from './config'
-import { MAJOR_PENTATONIC } from './scale'
-
+import type { SonificationConfig } from '@core/config'
+import { MAJOR_PENTATONIC } from '@core/scale'
 export interface SamplePreset {
   id: string
   name: string

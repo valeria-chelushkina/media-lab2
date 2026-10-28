@@ -1,7 +1,6 @@
 import type { SonificationConfig } from '@core/config'
 import type { Dataset } from '@core/types'
-import { MappingEditor } from './MappingEditor'
-
+import { MappingEditor } from '@renderer/components/MappingEditor'
 interface MappingPanelProps {
   dataset: Dataset
   config: SonificationConfig

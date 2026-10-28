@@ -1,5 +1,4 @@
-import type { MappingSectionWrapperProps } from '../../typedefs/mapping.typedefs'
-
+import type { MappingSectionWrapperProps } from '@renderer/typedefs/mapping.typedefs'
 export function MappingSection({ title, children }: MappingSectionWrapperProps): React.JSX.Element {
   return (
     <section className="mapping-block">

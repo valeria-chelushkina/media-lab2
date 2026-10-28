@@ -1,7 +1,6 @@
 import type { SonificationConfig } from '@core/config'
 import type { NoteEvent } from '@core/types'
-import type { Preview } from '../types'
-
+import type { Preview } from '@renderer/types'
 export interface UsePlaybackTriggerProps {
   preview: Preview
   config: SonificationConfig | null

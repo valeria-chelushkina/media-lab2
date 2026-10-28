@@ -1,6 +1,5 @@
 import { Midi } from '@tonejs/midi'
-import type { MidiBuildOptions, NoteEvent } from './types'
-
+import type { MidiBuildOptions, NoteEvent } from '@core/types'
 // MIDI channels 0-15, excluding channel 9 (reserved for percussion)
 const MELODIC_CHANNELS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15]
 

@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import type { NumberInputProps } from '../../typedefs/mapping.typedefs'
-
+import type { NumberInputProps } from '@renderer/typedefs/mapping.typedefs'
 export function NumberInput({
   value,
   min,

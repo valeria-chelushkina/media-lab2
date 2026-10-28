@@ -1,7 +1,6 @@
 import type { SonificationConfig } from '@core/config'
 import type { Dataset } from '@core/types'
-import type { Status } from '../types'
-
+import type { Status } from '@renderer/types'
 export interface UseGenerateMidiProps {
   dataset: Dataset | null
   config: SonificationConfig | null

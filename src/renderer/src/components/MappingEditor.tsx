@@ -1,11 +1,10 @@
-import type { MappingEditorProps } from '../typedefs/mapping.typedefs'
-import { DurationSection } from './mapping/DurationSection'
-import { GlobalSection } from './mapping/GlobalSection'
-import { InstrumentSection } from './mapping/InstrumentSection'
-import { PitchSection } from './mapping/PitchSection'
-import { TimeSection } from './mapping/TimeSection'
-import { VelocitySection } from './mapping/VelocitySection'
-
+import type { MappingEditorProps } from '@renderer/typedefs/mapping.typedefs'
+import { DurationSection } from '@renderer/components/mapping/DurationSection'
+import { GlobalSection } from '@renderer/components/mapping/GlobalSection'
+import { InstrumentSection } from '@renderer/components/mapping/InstrumentSection'
+import { PitchSection } from '@renderer/components/mapping/PitchSection'
+import { TimeSection } from '@renderer/components/mapping/TimeSection'
+import { VelocitySection } from '@renderer/components/mapping/VelocitySection'
 export function MappingEditor({
   columns,
   config,

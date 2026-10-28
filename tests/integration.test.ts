@@ -1,10 +1,9 @@
 import { Midi } from '@tonejs/midi'
 import { describe, expect, it } from 'vitest'
-import { buildMidi } from '../src/core/buildMidi'
-import type { SonificationConfig } from '../src/core/config'
-import { sonify } from '../src/core/sonify'
-import type { NumericRow } from '../src/core/types'
-
+import { buildMidi } from '@core/buildMidi'
+import type { SonificationConfig } from '@core/config'
+import { sonify } from '@core/sonify'
+import type { NumericRow } from '@core/types'
 const rows: NumericRow[] = [
   { energy: 10, valence: 20, danceability: 30, texture: 10, timestamp: 0 },
   { energy: 20, valence: 50, danceability: 40, texture: 50, timestamp: 4 },

@@ -3,11 +3,10 @@ import type { OpenDialogOptions, SaveDialogOptions } from 'electron'
 import { readFile, writeFile, access } from 'node:fs/promises'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
-import { parseCsv } from '../core/loadCsv'
-import { getSamplePreset } from '../core/presets'
-import { IPC, type OpenCsvResult, type SaveMidiResult, type OpenMidiResult } from '../shared/ipc'
-
+import icon from '@resources/icon.png?asset'
+import { parseCsv } from '@core/loadCsv'
+import { getSamplePreset } from '@core/presets'
+import { IPC, type OpenCsvResult, type SaveMidiResult, type OpenMidiResult } from '@shared/ipc'
 let mainWindow: BrowserWindow | null = null
 
 function createWindow(): void {

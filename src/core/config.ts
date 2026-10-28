@@ -1,6 +1,5 @@
 import { z } from 'zod'
-import { MAJOR_PENTATONIC } from './scale'
-
+import { MAJOR_PENTATONIC } from '@core/scale'
 const scaleSchema = z.array(z.number().int().min(0).max(11)).min(1)
 
 const velocitySchema = z

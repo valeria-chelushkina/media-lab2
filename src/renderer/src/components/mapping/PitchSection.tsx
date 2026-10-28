@@ -1,11 +1,10 @@
 import { SCALE_PRESETS } from '@core/scale'
-import type { MappingSectionProps } from '../../typedefs/mapping.typedefs'
-import { ROOT_NOTE_OPTIONS } from '../../lib/midi'
-import { ColumnSelect } from './ColumnSelect'
-import { Field } from './Field'
-import { MappingSection } from './MappingSection'
-import { NumberInput } from './NumberInput'
-
+import type { MappingSectionProps } from '@renderer/typedefs/mapping.typedefs'
+import { ROOT_NOTE_OPTIONS } from '@renderer/lib/midi'
+import { ColumnSelect } from '@renderer/components/mapping/ColumnSelect'
+import { Field } from '@renderer/components/mapping/Field'
+import { MappingSection } from '@renderer/components/mapping/MappingSection'
+import { NumberInput } from '@renderer/components/mapping/NumberInput'
 export function PitchSection({
   columns,
   config,

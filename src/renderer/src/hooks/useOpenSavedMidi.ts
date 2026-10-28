@@ -1,6 +1,5 @@
-import { toMessage } from '../lib/format'
-import type { UseOpenSavedMidiProps } from '../typedefs/useOpenSavedMidi.typedefs'
-
+import { toMessage } from '@renderer/lib/format'
+import type { UseOpenSavedMidiProps } from '@renderer/typedefs/useOpenSavedMidi.typedefs'
 export function useOpenSavedMidi({
   savedPath,
   setStatus

@@ -1,8 +1,7 @@
 import { Midi } from '@tonejs/midi'
 import { describe, expect, it } from 'vitest'
-import { buildMidi, midiToBytes } from '../src/core/buildMidi'
-import type { NoteEvent } from '../src/core/types'
-
+import { buildMidi, midiToBytes } from '@core/buildMidi'
+import type { NoteEvent } from '@core/types'
 function note(overrides: Partial<NoteEvent> = {}): NoteEvent {
   return {
     midi: 60,

@@ -1,8 +1,7 @@
-import { sonificationConfigSchema, type SonificationConfig } from './config'
-import { lerp, makeNormalizer } from './normalize'
-import { toMidiNote } from './scale'
-import type { NoteEvent, NumericRow } from './types'
-
+import { sonificationConfigSchema, type SonificationConfig } from '@core/config'
+import { lerp, makeNormalizer } from '@core/normalize'
+import { toMidiNote } from '@core/scale'
+import type { NoteEvent, NumericRow } from '@core/types'
 // сonverts rows into note events.
 export function sonify(rows: readonly NumericRow[], config: SonificationConfig): NoteEvent[] {
   const cfg = sonificationConfigSchema.parse(config)

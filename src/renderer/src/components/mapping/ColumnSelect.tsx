@@ -1,5 +1,4 @@
-import type { ColumnSelectProps } from '../../typedefs/mapping.typedefs'
-
+import type { ColumnSelectProps } from '@renderer/typedefs/mapping.typedefs'
 export function ColumnSelect({ value, columns, onChange }: ColumnSelectProps): React.JSX.Element {
   return (
     <select value={value} onChange={(event) => onChange(event.target.value)}>

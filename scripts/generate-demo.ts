@@ -1,8 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { buildMidi, defaultConfig, sonify } from '../src/core'
-import { parseCsv } from '../src/core/loadCsv'
-
+import { buildMidi, defaultConfig, sonify } from '@core'
+import { parseCsv } from '@core/loadCsv'
 async function main(): Promise<void> {
   const root = process.cwd()
   const inputPath = join(root, 'data', 'weather.csv')

@@ -1,12 +1,11 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { buildMidi } from '../src/core/buildMidi'
-import { unmappedFields } from '../src/core/config'
-import { parseCsv } from '../src/core/loadCsv'
-import { getSamplePreset, SAMPLE_PRESETS } from '../src/core/presets'
-import { sonify } from '../src/core/sonify'
-
+import { buildMidi } from '@core/buildMidi'
+import { unmappedFields } from '@core/config'
+import { parseCsv } from '@core/loadCsv'
+import { getSamplePreset, SAMPLE_PRESETS } from '@core/presets'
+import { sonify } from '@core/sonify'
 const dataDirectory = join(process.cwd(), 'data')
 
 describe('sample presets', () => {
