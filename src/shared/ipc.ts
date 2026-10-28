@@ -1,6 +1,5 @@
 import type { Dataset } from '../core/types'
 
-/** Channel names shared by the main process, preload, and renderer. */
 export const IPC = {
   openCsv: 'csv:open',
   openSample: 'sample:open',

@@ -1,6 +1,6 @@
 # Data Sonifier
 
-**Laboratory work No. 2 — Data Sonification**  
+**Laboratory work No. 2 — Data Sonification**
 
 A desktop application that turns numeric data into a MIDI composition.
 
@@ -106,6 +106,14 @@ The **Piano roll** panel shows:
 Press **Play** to hear the synth preview. The rose line shows playback progress.
 
 The preview uses Tone.js synthesizers, not General MIDI samples. The exported `.mid` can sound different in a DAW or online player.
+
+#### How the piano roll is built
+
+`PianoRoll.tsx` renders an SVG. Each note becomes a `<rect>`: `x` and width come from its time and duration, `y` from its MIDI note, color from the instrument, and opacity from velocity. Geometry is calculated in `lib/pianoRoll.ts`; a `ResizeObserver` keeps the roll responsive, and a vertical line follows playback progress.
+
+#### How the preview sound is produced
+
+`usePlayback` calls `Tone.start()` on the Play click. `lib/playback.ts` creates one `PolySynth` per instrument program and schedules each note on `Tone.Transport` with its time, duration, and velocity. A `requestAnimationFrame` loop updates the playhead; Stop cancels the transport and disposes the synths.
 
 ### 4. Export
 
